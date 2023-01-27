@@ -5,7 +5,7 @@ class MessageController < ApplicationController
   private
 
   def message_params
-    params.permit(:sender_id, :receiver_id, :content)
+    params.permit(:sender_id, :receiver_id, :content, :response)
   end
 
   def authorize

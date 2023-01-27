@@ -5,7 +5,7 @@ class FriendshipController < ApplicationController
   private
 
   def friendship_params
-    params.permit(:friender_id, :friendee_id)
+    params.permit(:friender_id, :friendee_id, :status)
   end
 
   def authorize
