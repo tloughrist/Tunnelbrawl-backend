@@ -11,6 +11,22 @@ class FriendshipController < ApplicationController
     end
   end
 
+  def update
+    friendship = Friendship.find(params[:id])
+    friendship.update(friendship_params)
+    if friendship.valid?
+      render json: friendship, status: :accepted
+    else
+      render json: { errors: friendship.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    friendship = Friendship.find(params[:id])
+    friendship.destroy
+    head :no_content
+  end
+
   private
 
   def friendship_params
