@@ -10,7 +10,8 @@ class Game < ApplicationRecord
   def generate_pieces()
     players = self.players
     starting_pawns = players.map{|player| generate_starting_pawns(self.id, player.id, player.color)}
-    deck = players.map{|player| generate_deck(self.id, player.id)}
+    decks = players.map{|player| generate_deck(self.id, player.id)}
+    pieces = starting_pawns.flatten + decks.flatten
   end
 
   #creates the starting camp of pawns for each player
