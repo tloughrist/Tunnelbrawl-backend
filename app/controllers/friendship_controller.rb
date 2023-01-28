@@ -1,6 +1,15 @@
 class FriendshipController < ApplicationController
 
   before_action :authorize
+  
+  def create
+    friendship = Friendship.create(friendship_params)
+    if friendship.valid?
+      render json: friendship, status: :created
+    else
+      render json: { errors: friendship.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
 
   private
 

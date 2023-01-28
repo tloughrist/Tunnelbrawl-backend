@@ -12,4 +12,4 @@ users = User.create([
   { name: 'Martha Nussbaum', username: 'mnussbaum', password_digest: User.digest('proxy'), email: 'tim.loughrist@gmail.com' },
   { name: 'Andrea Dworkin', username: 'adworkin', password_digest: User.digest('proxy'), email: 'tim.loughrist@gmail.com' },
   { name: 'Jacques Derrida', username: 'jderrida', password_digest: User.digest('proxy'), email: 'tim.loughrist@gmail.com' }
-]);
+])

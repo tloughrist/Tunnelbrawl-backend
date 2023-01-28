@@ -6,14 +6,15 @@ class Game < ApplicationRecord
 
   validates :no_players, numericality: { less_than: 5 }
 
-  def generate_pieces(game_id)
-    game = Game.find(game_id)
-    players = game.players
-    starting_pawns = [...players.map{|player| generate_starting_pawns(game.id, player.id, player.color)}]
-    remaining_deck = [...players.map{|player| generate_deck(game.id, player.id)}]
+  #creates all the initial pieces for the game
+  def generate_pieces()
+    players = self.players
+    starting_pawns = [...players.map{|player| generate_starting_pawns(self.id, player.id, player.color)}]
+    remaining_deck = [...players.map{|player| generate_deck(self.id, player.id)}]
     return [...starting_pawns, ...remaining_deck]
   end
 
+  #creates the starting camp of pawns for each player
   def generate_starting_pawns(game_id, player_id, color)
     def generate_pawn(location)
       Piece.create({ :game_id => game_id, :player_id => player_id, :type => "pawn", :first_move => true, :location => location })
@@ -57,6 +58,7 @@ class Game < ApplicationRecord
     end
   end
 
+  #creates the hand (71-74) and deck (81-88) for each player
   def generate_deck(game_id, player_id)
     def generate_piece(type, location)
       Piece.create({ :game_id => game_id, :player_id => player_id, :type => type, :first_move => true, :location => location })
