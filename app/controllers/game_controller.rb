@@ -11,6 +11,14 @@ class GameController < ApplicationController
     end
   end
 
+  def initialize
+    Game.update(params[:game_id], :status => 'active')
+    game = Game.find(params[:game_id])
+    pieces = game.generate_pieces()
+    package = {game: game, pieces: pieces}
+    render json: package, status: :ok
+  end
+
   private
 
   def game_params

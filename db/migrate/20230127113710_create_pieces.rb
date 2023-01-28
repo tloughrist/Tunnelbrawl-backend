@@ -3,7 +3,7 @@ class CreatePieces < ActiveRecord::Migration[7.0]
     create_table :pieces do |t|
       t.references :game, foreign_key: { to_table: :games }
       t.references :player, foreign_key: { to_table: :players }
-      t.string :type
+      t.string :rank
       t.boolean :first_move
       t.integer :location
 
