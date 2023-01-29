@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   
-  #Logging and authentication routes
+  #logging and authentication routes
   post "/login", to: "sessions#create"
   post "/signup", to: "users#create"
   get "/me", to: "users#self"

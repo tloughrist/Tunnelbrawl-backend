@@ -4,6 +4,8 @@ class GameController < ApplicationController
 
   def create
     game = Game.create(game_params)
+    board = Board.create(game_id: game.id)
+    game.update(board_id: board.id)
     if game.valid?
       render json: game, status: :created
     else
@@ -27,6 +29,7 @@ class GameController < ApplicationController
     head :no_content
   end
 
+  #used to create and place the initial pieces and set game to active status
   def initialize
     Game.update(params[:game_id], :status => 'active')
     game = Game.find(params[:game_id])
