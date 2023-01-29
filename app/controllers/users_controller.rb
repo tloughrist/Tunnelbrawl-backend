@@ -1,4 +1,4 @@
-class UserController < ApplicationController
+class UsersController < ApplicationController
 
   before_action :authorize
   skip_before_action :authorize, only: [:create]
@@ -19,6 +19,16 @@ class UserController < ApplicationController
       render json: user, status: :ok
     else
       render json: { error: "Not authorized" }, status: :unauthorized
+    end
+  end
+
+  def get_friends
+    user = User.find(params[:user_id])
+    friends = user.friends
+    if friends.size > 0
+      render json: friends, status: :ok
+    else
+      render json: { errors: "Sorry, you have no friends" }, status: :not_found
     end
   end
 

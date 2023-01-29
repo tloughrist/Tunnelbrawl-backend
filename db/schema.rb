@@ -174,14 +174,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_29_144748) do
 
   create_table "games", force: :cascade do |t|
     t.integer "host_id"
-    t.integer "board_id"
     t.integer "no_players"
     t.string "turn"
     t.integer "round"
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["board_id"], name: "index_games_on_board_id"
     t.index ["host_id"], name: "index_games_on_host_id"
   end
 
@@ -195,18 +193,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_29_144748) do
     t.index ["receiver_id"], name: "index_messages_on_receiver_id"
     t.index ["response_id"], name: "index_messages_on_response_id"
     t.index ["sender_id"], name: "index_messages_on_sender_id"
-  end
-
-  create_table "pieces", force: :cascade do |t|
-    t.integer "game_id"
-    t.integer "player_id"
-    t.string "rank"
-    t.boolean "first_move"
-    t.integer "location"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["game_id"], name: "index_pieces_on_game_id"
-    t.index ["player_id"], name: "index_pieces_on_player_id"
   end
 
   create_table "players", force: :cascade do |t|
@@ -232,13 +218,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_29_144748) do
   add_foreign_key "boards", "games"
   add_foreign_key "friendships", "users", column: "friendee_id"
   add_foreign_key "friendships", "users", column: "friender_id"
-  add_foreign_key "games", "boards"
   add_foreign_key "games", "users", column: "host_id"
   add_foreign_key "messages", "messages", column: "response_id"
   add_foreign_key "messages", "users", column: "receiver_id"
   add_foreign_key "messages", "users", column: "sender_id"
-  add_foreign_key "pieces", "games"
-  add_foreign_key "pieces", "players"
   add_foreign_key "players", "games"
   add_foreign_key "players", "users"
 end

@@ -1,16 +1,14 @@
 class Game < ApplicationRecord
 
   belongs_to :host, class_name: 'User'
-  belongs_to :board, dependent: :destroy, optional: true
+  has_one :board, dependent: :destroy
   has_many :players, dependent: :destroy
-  has_many :pieces, dependent: :destroy
 
   validates :no_players, numericality: { less_than: 5 }, allow_blank: true
 
   def make_board()
     game = self
     board = Board.create(game_id: game.id)
-    game.update(board_id: board.id)
   end
 
   # #creates all the initial pieces for the game

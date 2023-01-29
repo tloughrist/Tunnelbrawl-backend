@@ -1,4 +1,4 @@
-class BoardController < ApplicationController
+class BoardsController < ApplicationController
 
   before_action :authorize
 

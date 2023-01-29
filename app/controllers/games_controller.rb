@@ -1,4 +1,4 @@
-class GameController < ApplicationController
+class GamesController < ApplicationController
 
   before_action :authorize
 
