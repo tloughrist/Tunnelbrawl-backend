@@ -20,4 +20,8 @@ Rails.application.routes.draw do
   get "users/:user_id/friends", to: "users#get_friends"
   get "users/:user_id/games", to: "users#get_games"
 
+  # Routing logic: fallback requests for React Router.
+  # Leave this here to help deploy your app later!
+  get "*path", to: "fallback#index", constraints: ->(req) { !req.xhr? && req.format.html? }
+  
 end
