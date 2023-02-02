@@ -1,6 +1,6 @@
 class GamesController < ApplicationController
 
-  #before_action :authorize
+  before_action :authorize
 
   def create
     game = Game.create(game_params)

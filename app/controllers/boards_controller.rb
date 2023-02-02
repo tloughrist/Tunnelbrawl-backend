@@ -1,6 +1,6 @@
 class BoardsController < ApplicationController
 
-  #before_action :authorize
+  before_action :authorize
 
   def update
     board = board.find(params[:id])
