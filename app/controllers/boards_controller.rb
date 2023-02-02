@@ -3,7 +3,7 @@ class BoardsController < ApplicationController
   before_action :authorize
 
   def update
-    board = board.find(params[:id])
+    board = Board.find(params[:id])
     board.update(board_params)
     if board.valid?
       render json: board, status: :accepted
@@ -20,7 +20,7 @@ class BoardsController < ApplicationController
   end
 
   def authorize
-    return render json: { error: "Not authorized" }, status: :unauthorized unless session.include? :board_id
+    return render json: { error: "Not authorized" }, status: :unauthorized unless session.include? :user_id
   end
 
 end

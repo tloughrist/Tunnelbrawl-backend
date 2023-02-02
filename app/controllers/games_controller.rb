@@ -17,6 +17,7 @@ class GamesController < ApplicationController
     game = Game.find(params[:id])
     game.update(game_params)
     if game.valid?
+      pry()
       render json: game, status: :accepted
     else
       render json: { errors: game.errors.full_messages }, status: :unprocessable_entity
@@ -36,7 +37,7 @@ class GamesController < ApplicationController
   end
 
   def authorize
-    return render json: { error: "Not authorized" }, status: :unauthorized unless session.include? :game_id
+    return render json: { error: "Not authorized" }, status: :unauthorized unless session.include? :user_id
   end
 
 end
