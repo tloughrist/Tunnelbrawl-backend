@@ -1,6 +1,6 @@
 class GamesController < ApplicationController
 
-  before_action :authorize
+  #before_action :authorize
 
   def create
     game = Game.create(game_params)
@@ -29,19 +29,10 @@ class GamesController < ApplicationController
     head :no_content
   end
 
-  #used to create and place the initial pieces and set game to active status
-  def initialize
-    Game.update(params[:game_id], :status => 'active')
-    game = Game.find(params[:game_id])
-    pieces = game.generate_pieces()
-    package = {game: game, pieces: pieces}
-    render json: package, status: :ok
-  end
-
   private
 
   def game_params
-    params.permit(:host_id, :no_players, :turn, :round, :status)
+    params.permit(:host_id, :no_players, :turn, :round, :phase, :status)
   end
 
   def authorize

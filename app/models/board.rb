@@ -1,4 +1,5 @@
 class Board < ApplicationRecord
+
   belongs_to :game, optional: true
 
   def begin_game()

@@ -32,6 +32,16 @@ class UsersController < ApplicationController
     end
   end
 
+  def get_games
+    user = User.find(params[:user_id])
+    games = user.games
+    if games.size > 0
+      render json: games, each_serializer: GameSerializer, status: :ok
+    else
+      render json: { errors: "Sorry, you have no games" }, status: :not_found
+    end
+  end
+
   def update
     user = User.find(params[:id])
     user.update(user_params)

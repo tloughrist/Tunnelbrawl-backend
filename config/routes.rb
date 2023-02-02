@@ -8,6 +8,7 @@ Rails.application.routes.draw do
 
   #standard routes
   resources :games, only: [:create, :update, :destroy]
+  resources :boards, only: [:update]
   resources :users, only: [:update, :destroy]
   resources :player, only: [:create, :update, :destroy]
   resources :piece, only: [:update]
@@ -17,5 +18,6 @@ Rails.application.routes.draw do
   #custom routes
   get "games/initialize/:game_id", to: "games#initialize"
   get "users/:user_id/friends", to: "users#get_friends"
+  get "users/:user_id/games", to: "users#get_games"
 
 end
