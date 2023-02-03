@@ -17,10 +17,25 @@ class GamesController < ApplicationController
     game = Game.find(params[:id])
     game.update(game_params)
     if game.valid?
-      pry()
-      render json: game, status: :accepted
+      games = game.host.games
+      gamePackages = games.map {|game| {game: game, board: game.board} }
+      render json: gamePackages, status: :accepted
     else
       render json: { errors: game.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def initialize_game
+    game = Game.find(params[:game_id])
+    board = game.board
+    if game.no_players > 1
+      board.begin_game(game.no_players)
+      game.update(game_params)
+      games = game.host.games
+      gamePackages = games.map {|game| {game: game, board: game.board} }
+      render json: gamePackages, status: :accepted
+    else
+      render json: { errors: "Games require 2-4 players." }, status: :unprocessable_entity
     end
   end
 

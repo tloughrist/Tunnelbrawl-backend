@@ -16,7 +16,7 @@ Rails.application.routes.draw do
   resources :friendship, only: [:create, :update, :destroy]
 
   #custom routes
-  get "games/initialize/:game_id", to: "games#initialize"
+  put "games/initialize/:game_id", to: "games#initialize_game"
   get "users/:user_id/friends", to: "users#get_friends"
   get "users/:user_id/games", to: "users#get_games"
 
