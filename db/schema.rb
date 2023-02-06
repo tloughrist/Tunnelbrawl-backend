@@ -174,6 +174,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_29_144748) do
 
   create_table "games", force: :cascade do |t|
     t.integer "host_id"
+    t.string "title"
     t.integer "no_players"
     t.string "turn"
     t.integer "round"

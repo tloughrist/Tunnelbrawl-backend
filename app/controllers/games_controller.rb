@@ -48,7 +48,7 @@ class GamesController < ApplicationController
   private
 
   def game_params
-    params.permit(:host_id, :no_players, :turn, :round, :phase, :status)
+    params.permit(:host_id, :title, :no_players, :turn, :round, :phase, :status)
   end
 
   def authorize
