@@ -36,7 +36,7 @@ class UsersController < ApplicationController
     user = User.find(params[:user_id])
     games = user.games
     if games.size > 0
-      gamePackages = games.map {|game| {game: {**game, host: game.host.username}, board: game.board} }
+      gamePackages = games.map {|game| {game: {**game.attributes, host: game.host.username, players: game.players}, board: game.board} }
       render json: gamePackages, status: :ok
     else
       render json: { errors: "Sorry, you have no games" }, status: :not_found

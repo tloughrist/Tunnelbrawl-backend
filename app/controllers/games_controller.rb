@@ -31,9 +31,8 @@ class GamesController < ApplicationController
     if game.no_players > 1
       board.begin_game(game.no_players)
       game.update(game_params)
-      games = game.host.games
-      gamePackages = games.map {|game| {game: game, board: game.board} }
-      render json: gamePackages, status: :accepted
+      gamePackage = {game: {**game.attributes, host: game.host.username, players: game.players}, board: board}
+      render json: gamePackage, status: :accepted
     else
       render json: { errors: "Games require 2-4 players." }, status: :unprocessable_entity
     end
