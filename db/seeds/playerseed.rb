@@ -1,4 +1,4 @@
-players = Player.create([
+players = Player.create!([
   { user_id: 1, game_id: 1, status: "active", color: "red" },
   { user_id: 2, game_id: 1, status: "active", color: "blue" },
   { user_id: 3, game_id: 1, status: "active", color: "green" },

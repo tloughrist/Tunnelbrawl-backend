@@ -4,10 +4,11 @@ class GamesController < ApplicationController
 
   def create
     game = Game.create(game_params)
-    board = Board.create(game_id: game.id)
-    game.update(board_id: board.id)
+    board = game.make_board
+    Player.create(user_id: game.host_id, game_id: game.id, color: "red")
     if game.valid?
-      render json: game, status: :created
+      package = game.package
+      render json: package, status: :created
     else
       render json: { errors: game.errors.full_messages }, status: :unprocessable_entity
     end
@@ -15,39 +16,51 @@ class GamesController < ApplicationController
 
   def update
     game = Game.find(params[:id])
-    game.update(game_params)
-    if game.valid?
-      games = game.host.games
-      gamePackages = games.map {|game| {game: game, board: game.board} }
-      render json: gamePackages, status: :accepted
+    if game.players.map{|player| player.user_id.to_i}.include?(session[:user_id])
+      game.update(game_params)
+      if game.valid?
+        games = game.host.games
+        gamePackages = games.map {|game| game.package() }
+        render json: gamePackages, status: :accepted
+      else
+        render json: { errors: game.errors.full_messages }, status: :unprocessable_entity
+      end
     else
-      render json: { errors: game.errors.full_messages }, status: :unprocessable_entity
+      return render json: { error: "Not authorized" }, status: :unauthorized
     end
   end
 
   def initialize_game
     game = Game.find(params[:game_id])
-    board = game.board
-    if game.no_players > 1
-      board.begin_game(game.no_players)
-      game.update(game_params)
-      gamePackage = {game: {**game.attributes, host: game.host.username, players: game.players}, board: board}
-      render json: gamePackage, status: :accepted
+    if game.host.id.to_i == session[:user_id]
+      board = game.board
+      if game.no_players > 1
+        board.begin_game(game.no_players)
+        game.update(game_params)
+        gamePackage = game.package
+        render json: gamePackage, status: :accepted
+      else
+        render json: { errors: "Games require 2-4 players." }, status: :unprocessable_entity
+      end
     else
-      render json: { errors: "Games require 2-4 players." }, status: :unprocessable_entity
+      return render json: { error: "Not authorized" }, status: :unauthorized
     end
   end
 
   def destroy
     game = Game.find(params[:id])
-    game.destroy
-    head :no_content
+    if game.host.id.to_i == session[:user_id]
+      game.destroy
+      head :no_content
+    else
+      return render json: { error: "Not authorized" }, status: :unauthorized
+    end
   end
 
   private
 
   def game_params
-    params.permit(:host_id, :title, :no_players, :turn, :round, :phase, :status)
+    params.permit(:host_id, :title, :no_players, :turn, :round, :phase, :status, :email_notifications, :public)
   end
 
   def authorize

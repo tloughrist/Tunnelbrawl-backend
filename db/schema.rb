@@ -10,9 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_01_29_144748) do
+ActiveRecord::Schema[7.0].define(version: 2023_02_07_224417) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "boards", force: :cascade do |t|
-    t.integer "game_id"
+    t.bigint "game_id"
     t.string "loc21"
     t.string "loc31"
     t.string "loc41"
@@ -163,8 +166,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_29_144748) do
   end
 
   create_table "friendships", force: :cascade do |t|
-    t.integer "friender_id"
-    t.integer "friendee_id"
+    t.bigint "friender_id"
+    t.bigint "friendee_id"
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -173,9 +176,11 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_29_144748) do
   end
 
   create_table "games", force: :cascade do |t|
-    t.integer "host_id"
+    t.bigint "host_id"
     t.string "title"
     t.integer "no_players"
+    t.boolean "email_notifications"
+    t.boolean "public"
     t.string "turn"
     t.integer "round"
     t.string "phase"
@@ -185,21 +190,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_29_144748) do
     t.index ["host_id"], name: "index_games_on_host_id"
   end
 
-  create_table "messages", force: :cascade do |t|
-    t.integer "sender_id"
-    t.integer "receiver_id"
-    t.integer "response_id"
-    t.text "content"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["receiver_id"], name: "index_messages_on_receiver_id"
-    t.index ["response_id"], name: "index_messages_on_response_id"
-    t.index ["sender_id"], name: "index_messages_on_sender_id"
-  end
-
   create_table "players", force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "game_id"
+    t.bigint "user_id"
+    t.bigint "game_id"
     t.string "status"
     t.string "color"
     t.datetime "created_at", null: false
@@ -221,9 +214,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_29_144748) do
   add_foreign_key "friendships", "users", column: "friendee_id"
   add_foreign_key "friendships", "users", column: "friender_id"
   add_foreign_key "games", "users", column: "host_id"
-  add_foreign_key "messages", "messages", column: "response_id"
-  add_foreign_key "messages", "users", column: "receiver_id"
-  add_foreign_key "messages", "users", column: "sender_id"
   add_foreign_key "players", "games"
   add_foreign_key "players", "users"
 end

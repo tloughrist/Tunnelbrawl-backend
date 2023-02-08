@@ -23,8 +23,12 @@ class FriendshipsController < ApplicationController
 
   def destroy
     friendship = Friendship.find(params[:id])
-    friendship.destroy
-    head :no_content
+    if [friendship.friendee_id.to_i, friendship.friender_id.to_i].include?(session[:user_id])
+      friendship.destroy
+      head :no_content
+    else
+      return render json: { error: "Not authorized" }, status: :unauthorized
+    end
   end
 
   private

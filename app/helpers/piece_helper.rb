@@ -1,2 +1,0 @@
-module PieceHelper
-end

@@ -13,18 +13,26 @@ class PlayersController < ApplicationController
 
   def update
     player = Player.find(params[:id])
-    player.update(player_params)
-    if player.valid?
-      render json: player, status: :accepted
+    if player.user.id.to_i == session[:user_id]
+      player.update(player_params)
+      if player.valid?
+        render json: player, status: :accepted
+      else
+        render json: { errors: player.errors.full_messages }, status: :unprocessable_entity
+      end
     else
-      render json: { errors: player.errors.full_messages }, status: :unprocessable_entity
+      render json: { error: "Not authorized" }, status: :unauthorized
     end
   end
 
   def destroy
     player = Player.find(params[:id])
-    player.destroy
-    head :no_content
+    if player.user.id.to_i == session[:user_id]
+      player.destroy
+      head :no_content
+    else
+      render json: { error: "Not authorized" }, status: :unauthorized
+    end
   end
 
   private

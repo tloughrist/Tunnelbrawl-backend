@@ -9,10 +9,8 @@ Rails.application.routes.draw do
   #standard routes
   resources :games, only: [:create, :update, :destroy]
   resources :boards, only: [:update]
-  resources :users, only: [:update, :destroy]
+  resources :users, only: [:index, :update, :destroy]
   resources :player, only: [:create, :update, :destroy]
-  resources :piece, only: [:update]
-  resources :message, only: [:create, :destroy]
   resources :friendship, only: [:create, :update, :destroy]
 
   #custom routes

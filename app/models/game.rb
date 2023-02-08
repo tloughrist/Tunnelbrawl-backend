@@ -11,4 +11,7 @@ class Game < ApplicationRecord
     board = Board.create(game_id: game.id)
   end
 
+  def package()
+    {game: {**self.attributes, host: self.host.username, players: self.players}, board: self.board}
+  end
 end

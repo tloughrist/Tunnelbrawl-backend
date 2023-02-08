@@ -4,11 +4,15 @@ class BoardsController < ApplicationController
 
   def update
     board = Board.find(params[:id])
-    board.update(board_params)
-    if board.valid?
-      render json: board, status: :accepted
+    if board.players.map{|player| player.user_id.to_i}.include?(session[:user_id])
+      board.update(board_params)
+      if board.valid?
+        render json: board, status: :accepted
+      else
+        render json: { errors: board.errors.full_messages }, status: :unprocessable_entity
+      end
     else
-      render json: { errors: board.errors.full_messages }, status: :unprocessable_entity
+      return render json: { error: "Not authorized" }, status: :unauthorized
     end
   end
 
