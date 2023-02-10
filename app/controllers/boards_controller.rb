@@ -7,7 +7,8 @@ class BoardsController < ApplicationController
     if board.players.map{|player| player.user_id.to_i}.include?(session[:user_id])
       board.update(board_params)
       if board.valid?
-        render json: board, status: :accepted
+        package = board.game.package
+        render json: package, status: :accepted
       else
         render json: { errors: board.errors.full_messages }, status: :unprocessable_entity
       end

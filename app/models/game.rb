@@ -9,6 +9,7 @@ class Game < ApplicationRecord
   def make_board()
     game = self
     board = Board.create(game_id: game.id)
+    board.empty
   end
 
   def package()

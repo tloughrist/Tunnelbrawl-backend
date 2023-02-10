@@ -19,9 +19,8 @@ class GamesController < ApplicationController
     if game.players.map{|player| player.user_id.to_i}.include?(session[:user_id])
       game.update(game_params)
       if game.valid?
-        games = game.host.games
-        gamePackages = games.map {|game| game.package() }
-        render json: gamePackages, status: :accepted
+        package = game.package 
+        render json: package, status: :accepted
       else
         render json: { errors: game.errors.full_messages }, status: :unprocessable_entity
       end

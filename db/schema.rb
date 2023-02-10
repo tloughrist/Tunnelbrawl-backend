@@ -206,6 +206,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_07_224417) do
     t.string "password_digest"
     t.string "email"
     t.string "pic_url"
+    t.string "current_game"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

@@ -13,11 +13,15 @@ class FriendshipsController < ApplicationController
 
   def update
     friendship = Friendship.find(params[:id])
-    friendship.update(friendship_params)
-    if friendship.valid?
-      render json: friendship, status: :accepted
+    if [friendship.friendee_id.to_i, friendship.friender_id.to_i].include?(session[:user_id])
+      friendship.update(friendship_params)
+      if friendship.valid?
+        render json: friendship, status: :accepted
+      else
+        render json: { errors: friendship.errors.full_messages }, status: :unprocessable_entity
+      end
     else
-      render json: { errors: friendship.errors.full_messages }, status: :unprocessable_entity
+      return render json: { error: "Not authorized" }, status: :unauthorized
     end
   end
 

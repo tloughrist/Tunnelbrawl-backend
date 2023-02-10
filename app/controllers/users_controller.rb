@@ -48,7 +48,7 @@ class UsersController < ApplicationController
   end
 
   def update
-    if params[:id] == session[:user_id]
+    if params[:id].to_i == session[:user_id]
       user = User.find(params[:id])
       user.update(user_params)
       if user.valid?
@@ -62,7 +62,7 @@ class UsersController < ApplicationController
   end
 
   def destroy
-    if params[:id] == session[:user_id]
+    if params[:id].to_i == session[:user_id]
       user = User.find(params[:id])
       user.destroy
       head :no_content
@@ -74,7 +74,7 @@ class UsersController < ApplicationController
   private
 
   def user_params
-    params.permit(:username, :password, :email, :pic_url)
+    params.permit(:username, :password, :email, :pic_url, :current_game)
   end
 
   def authorize
