@@ -17,6 +17,8 @@ Rails.application.routes.draw do
   put "games/initialize/:game_id", to: "games#initialize_game"
   get "users/:user_id/friends", to: "users#get_friends"
   get "users/:user_id/games", to: "users#get_games"
+  put "boards/show_moves/:board_id", to: "boards#show_moves"
+  put "boards/clear_highlights/:board_id", to: "boards#clear_highlights"
 
   # Routing logic: fallback requests for React Router.
   # Leave this here to help deploy your app later!

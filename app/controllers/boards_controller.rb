@@ -17,6 +17,32 @@ class BoardsController < ApplicationController
     end
   end
 
+  def show_moves
+    board = Board.find(params[:board_id])
+    game = board.game
+    players = game.players
+    if players.map{|player| player.user_id.to_i}.include?(session[:user_id])
+      board.legal_moves
+      package = game.package
+      render json: package, status: :accepted
+    else
+      return render json: { error: "Not authorized" }, status: :unauthorized
+    end
+  end
+
+  def clear_highlights
+    board = Board.find(params[:board_id])
+    game = board.game
+    players = game.players
+    if players.map{|player| player.user_id.to_i}.include?(session[:user_id])
+      board.clear
+      package = game.package
+      render json: package, status: :accepted
+    else
+      return render json: { error: "Not authorized" }, status: :unauthorized
+    end
+  end
+
   private
 
   def board_params

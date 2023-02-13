@@ -6,13 +6,18 @@ class Game < ApplicationRecord
 
   validates :no_players, numericality: { less_than: 5 }, allow_blank: true
 
-  def make_board()
+  def make_board
     game = self
     board = Board.create(game_id: game.id)
     board.empty
   end
 
-  def package()
+  def package
     {game: {**self.attributes, host: self.host.username, players: self.players}, board: self.board}
   end
+
+  def advance
+
+  end
+  
 end
