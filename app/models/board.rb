@@ -4,12 +4,12 @@ class Board < ApplicationRecord
   has_many :players, through: :game
 
   def empty
-    locs = ["loc21", "loc31", "loc41", "loc51", "loc26", "loc36", "loc46", "loc56", "loc12", "loc13", "loc14", "loc15", "loc62", "loc63", "loc64", "loc65", "loc101", "loc102", "loc103", "loc104", "loc111", "loc112", "loc113", "loc114", "loc115", "loc116", "loc117", "loc118", "loc201", "loc202", "loc203", "loc204", "loc211", "loc212", "loc213", "loc214", "loc215", "loc216", "loc217", "loc218", "loc301", "loc302", "loc303", "loc304", "loc311", "loc312", "loc313", "loc314", "loc315", "loc316", "loc317", "loc318", "loc401", "loc402", "loc403", "loc404", "loc411", "loc412", "loc413", "loc414", "loc415", "loc416", "loc417", "loc418", "loc22", "loc23", "loc24", "loc25", "loc32", "loc33", "loc34", "loc35", "loc42", "loc43", "loc44", "loc45", "loc52", "loc53", "loc54", "loc55", "loc121", "loc122", "loc123", "loc124", "loc125", "loc126", "loc127", "loc128", "loc129", "loc130", "loc131", "loc132", "loc133", "loc134", "loc135","loc136", "loc221", "loc222", "loc223", "loc224", "loc225", "loc226", "loc227", "loc228", "loc229", "loc230", "loc231", "loc232", "loc233", "loc234", "loc235","loc236", "loc321", "loc322", "loc323", "loc324", "loc325", "loc326", "loc327", "loc328", "loc329", "loc330", "loc331", "loc332", "loc333", "loc334", "loc335","loc336", "loc421", "loc422", "loc423", "loc424", "loc425", "loc426", "loc427", "loc428", "loc429", "loc430", "loc431", "loc432", "loc433", "loc434", "loc435","loc436"]
+    locs = ["loc21", "loc31", "loc41", "loc51", "loc26", "loc36", "loc46", "loc56", "loc12", "loc13", "loc14", "loc15", "loc62", "loc63", "loc64", "loc65", "loc101", "loc102", "loc103", "loc104", "loc111", "loc112", "loc113", "loc114", "loc115", "loc116", "loc117", "loc118", "loc201", "loc202", "loc203", "loc204", "loc211", "loc212", "loc213", "loc214", "loc215", "loc216", "loc217", "loc218", "loc301", "loc302", "loc303", "loc304", "loc311", "loc312", "loc313", "loc314", "loc315", "loc316", "loc317", "loc318", "loc401", "loc402", "loc403", "loc404", "loc411", "loc412", "loc413", "loc414", "loc415", "loc416", "loc417", "loc418", "loc22", "loc23", "loc24", "loc25", "loc32", "loc33", "loc34", "loc35", "loc42", "loc43", "loc44", "loc45", "loc52", "loc53", "loc54", "loc55" ]
     locs.each {|loc| self.update( loc => "em_s_highlight--none" )}   
   end
   
   def begin_game(no_players)
-    locs = ["loc21", "loc31", "loc41", "loc51", "loc26", "loc36", "loc46", "loc56", "loc12", "loc13", "loc14", "loc15", "loc62", "loc63", "loc64", "loc65", "loc101", "loc102", "loc103", "loc104", "loc111", "loc112", "loc113", "loc114", "loc115", "loc116", "loc117", "loc118", "loc201", "loc202", "loc203", "loc204", "loc211", "loc212", "loc213", "loc214", "loc215", "loc216", "loc217", "loc218", "loc301", "loc302", "loc303", "loc304", "loc311", "loc312", "loc313", "loc314", "loc315", "loc316", "loc317", "loc318", "loc401", "loc402", "loc403", "loc404", "loc411", "loc412", "loc413", "loc414", "loc415", "loc416", "loc417", "loc418", "loc22", "loc23", "loc24", "loc25", "loc32", "loc33", "loc34", "loc35", "loc42", "loc43", "loc44", "loc45", "loc52", "loc53", "loc54", "loc55", "loc121", "loc122", "loc123", "loc124", "loc125", "loc126", "loc127", "loc128", "loc129", "loc130", "loc131", "loc132", "loc133", "loc134", "loc135","loc136", "loc221", "loc222", "loc223", "loc224", "loc225", "loc226", "loc227", "loc228", "loc229", "loc230", "loc231", "loc232", "loc233", "loc234", "loc235","loc236", "loc321", "loc322", "loc323", "loc324", "loc325", "loc326", "loc327", "loc328", "loc329", "loc330", "loc331", "loc332", "loc333", "loc334", "loc335","loc336", "loc421", "loc422", "loc423", "loc424", "loc425", "loc426", "loc427", "loc428", "loc429", "loc430", "loc431", "loc432", "loc433", "loc434", "loc435","loc436"] 
+    locs = ["loc21", "loc31", "loc41", "loc51", "loc26", "loc36", "loc46", "loc56", "loc12", "loc13", "loc14", "loc15", "loc62", "loc63", "loc64", "loc65", "loc101", "loc102", "loc103", "loc104", "loc111", "loc112", "loc113", "loc114", "loc115", "loc116", "loc117", "loc118", "loc201", "loc202", "loc203", "loc204", "loc211", "loc212", "loc213", "loc214", "loc215", "loc216", "loc217", "loc218", "loc301", "loc302", "loc303", "loc304", "loc311", "loc312", "loc313", "loc314", "loc315", "loc316", "loc317", "loc318", "loc401", "loc402", "loc403", "loc404", "loc411", "loc412", "loc413", "loc414", "loc415", "loc416", "loc417", "loc418", "loc22", "loc23", "loc24", "loc25", "loc32", "loc33", "loc34", "loc35", "loc42", "loc43", "loc44", "loc45", "loc52", "loc53", "loc54", "loc55" ] 
     if no_players == 2
       self.place_pawns("red", locs)
       self.place_pawns("blue", locs)
@@ -98,8 +98,8 @@ class Board < ApplicationRecord
     }
   end
 
-  def legal_moves()
-    active_space = self.attributes.select {|k,v| v.to_s[16..-1] == "active"}
+  def legal_moves(piece_loc)
+    active_space = self.attributes.select {|k,v| k.to_s == piece_loc}
     active_loc = active_space.keys.map {|key| key.to_s[3..6]}[0].to_i
     active_piece = active_space.values.map {|value| value.to_s[0..1]}[0]
     active_status = active_space.values.map {|value| value.to_s[3]}[0]
@@ -287,33 +287,147 @@ class Board < ApplicationRecord
     legal_moves_keys = legal_hsh[:moves].map {|move| move.to_sym}
     legal_captures_keys = legal_hsh[:captures].map {|capture| capture.to_sym}
     
-    #legal_moves_keys.each {|key| self.update(self[:key] => "#{self[:key].to_s[0..15]}move")}
-    #legal_captures_keys.each {|key| self.update(self[:key] => "#{self[:key].to_s[0..15]}capture")}
+    legal_moves_keys.each {|key| self.update(self[:key] => "#{self[:key].to_s[0..15]}move")}
+    legal_captures_keys.each {|key| self.update(self[:key] => "#{self[:key].to_s[0..15]}capture")}
 
-    self
+    legal_hsh
   end
 
   def clear
     target_spaces = self.attributes.select {|k,v| v.to_s[16..-1] == "active" || v.to_s[16..-1] == "move" || v.to_s[16..-1] == "capture"}
     cleared_spaces = target_spaces.each {|k,v| v[16..-1] = "none"}
-    #cleared_spaces.each {|space| self.update(space)}
+    cleared_spaces.each {|space| self.update(space)}
     self
   end
 
-  def move
+  def move(start_loc, end_loc)
+    legal_moves = *self.legal_moves(start_loc)[:moves], *self.legal_moves(start_loc)[:captures]
+    self.clear
+    if legal_moves.include?(end_loc)
+      active_piece = self.attributes.select {|k,v| k.to_s == start_loc}
+      target = self.attributes.select {|k,v| k.to_s == end_loc}
+      self.capture(target[end_loc])
+      active_content = active_piece[start_loc]
+      active_content["_s_"] = "_a_"
+      target[end_loc] = active_content
+      active_piece[start_loc] = "em_s_highlight--none"
+      self.update(active_piece)
+      self.update(target)
+      #camp = self.camp.select {|k,v| v == "em_s_highlight--none"} 
+      #if camp.size == 0
+      #  self.game.advance
+      #end
+    else
+      puts("error: illegal move")
+    end
+  end
+
+  def capture(piece)
+    puts piece
+    game = self.game
+    if piece != "em_s_highlight--none"
+      def bury(color)
+        graves = self["#{color}_taken".to_sym]
+        graves << piece
+        self["#{color}_taken".to_sym] = graves
+      end
+      case game[:turn]
+      when "red"
+        bury("red")
+      when "green"
+        bury("green")
+      when "blue"
+        bury("blue")
+      when "yellow"
+        bury("yellow")
+      end
+    else
+      piece
+    end
+    if piece[1] == "k"
+      self.king
+    end
+  end
+
+  def king
+    puts("take queen")
+  end
+
+  def show_placement(piece_loc)
+    if self.is_hand?(piece_loc)
+      empties = self.camp.select {|k,v| v.to_s[0..1] == "em"}
+      highlit_empties = empties.each {|k,v| v = "#{v.to_s[0..15]}move"}
+      highlit_empties.each {|hash| self.update(hash)}
+      open_locs = empties.keys
+    else
+      puts("error: move phase ended; place piece from hand")
+    end
+  end
+
+  def place(start_loc, end_loc)
+    if show_placement(start_loc).include?(end_loc.to_sym)
+      active_piece = self.attributes.select {|k,v| k.to_s == start_loc}
+      target = self.attributes.select {|k,v| k.to_s == end_loc}
+      active_content = active_piece[start_loc]
+      target[end_loc] = active_content
+      self.update(active_piece)
+      self.update(target)
+      draw(start_loc)
+      self
+    else
+      puts("error: illegal placement")
+    end
 
   end
 
-  def reinforce
-
+  def is_hand?(loc)
+    color = self.game[:turn]
+    case color
+    when "red"
+      ["loc101", "loc102", "loc103", "loc104"].include?(loc)
+    when "green"
+      ["loc201", "loc202", "loc203", "loc204"].include?(loc)
+    when "blue"
+      ["loc301", "loc302", "loc303", "loc304"].include?(loc)
+    when "yellow"
+      ["loc401", "loc402", "loc403", "loc404"].include?(loc)
+    end
   end
 
-  def draw
-
+  def camp
+    color = self.game[:turn]
+    case color
+    when "red"
+      self.slice(:loc21, :loc31, :loc41, :loc51)
+    when "green"
+      self.slice(:loc12, :loc13, :loc14, :loc15)
+    when "blue"
+      self.slice(:loc26, :loc36, :loc46, :loc56)
+    when "yellow"
+      self.slice(:loc62, :loc63, :loc64, :loc65)
+    end
   end
 
-  def locked?
+  def deck
+    color = self.game[:turn]
+    case color
+    when "red"
+      self.slice(:loc111, :loc112, :loc113, :loc114, :loc115, :loc116, :loc117, :loc118)
+    when "green"
+      self.slice(:loc211, :loc212, :loc213, :loc214, :loc215, :loc216, :loc217, :loc218)
+    when "blue"
+      self.slice(:loc311, :loc312, :loc313, :loc314, :loc315, :loc316, :loc317, :loc318)
+    when "yellow"
+      self.slice(:loc411, :loc412, :loc413, :loc414, :loc415, :loc416, :loc417, :loc418)
+    end
+  end
 
+  def draw(loc)
+    remaining_cards = self.deck.select {|k,v| v.to_s[0..1] != "em"}
+    drawn = remaining_cards[remaining_cards.keys[0].to_sym]
+    self[remaining_cards.keys[0].to_sym] = "em_s_highlight--none"
+    self[loc.to_sym] = drawn
+    self
   end
 
 end

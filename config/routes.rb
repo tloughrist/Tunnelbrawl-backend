@@ -14,11 +14,13 @@ Rails.application.routes.draw do
   resources :friendship, only: [:create, :update, :destroy]
 
   #custom routes
-  put "games/initialize/:game_id", to: "games#initialize_game"
   get "users/:user_id/friends", to: "users#get_friends"
   get "users/:user_id/games", to: "users#get_games"
   put "boards/show_moves/:board_id", to: "boards#show_moves"
   put "boards/clear_highlights/:board_id", to: "boards#clear_highlights"
+  put "boards/move_piece/:board_id", to: "boards#move_piece"
+  put "games/initialize/:game_id", to: "games#initialize_game"
+  put "games/advance/:game_id", to: "games#advance"
 
   # Routing logic: fallback requests for React Router.
   # Leave this here to help deploy your app later!

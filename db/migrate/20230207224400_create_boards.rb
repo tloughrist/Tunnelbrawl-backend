@@ -85,70 +85,10 @@ class CreateBoards < ActiveRecord::Migration[7.0]
       t.string :loc54
       t.string :loc55
       
-      t.string :loc121
-      t.string :loc122
-      t.string :loc123
-      t.string :loc124
-      t.string :loc125
-      t.string :loc126
-      t.string :loc127
-      t.string :loc128
-      t.string :loc129
-      t.string :loc130
-      t.string :loc131
-      t.string :loc132
-      t.string :loc133
-      t.string :loc134
-      t.string :loc135
-      t.string :loc136
-      t.string :loc221
-      t.string :loc222
-      t.string :loc223
-      t.string :loc224
-      t.string :loc225
-      t.string :loc226
-      t.string :loc227
-      t.string :loc228
-      t.string :loc229
-      t.string :loc230
-      t.string :loc231
-      t.string :loc232
-      t.string :loc233
-      t.string :loc234
-      t.string :loc235
-      t.string :loc236
-      t.string :loc321
-      t.string :loc322
-      t.string :loc323
-      t.string :loc324
-      t.string :loc325
-      t.string :loc326
-      t.string :loc327
-      t.string :loc328
-      t.string :loc329
-      t.string :loc330
-      t.string :loc331
-      t.string :loc332
-      t.string :loc333
-      t.string :loc334
-      t.string :loc335
-      t.string :loc336
-      t.string :loc421
-      t.string :loc422
-      t.string :loc423
-      t.string :loc424
-      t.string :loc425
-      t.string :loc426
-      t.string :loc427
-      t.string :loc428
-      t.string :loc429
-      t.string :loc430
-      t.string :loc431
-      t.string :loc432
-      t.string :loc433
-      t.string :loc434
-      t.string :loc435
-      t.string :loc436
+      t.text :red_taken, array: true, default: []
+      t.text :green_taken, array: true, default: []
+      t.text :blue_taken, array: true, default: []
+      t.text :yellow_taken, array: true, default: []
 
       t.timestamps
     end

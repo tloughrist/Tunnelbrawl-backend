@@ -17,7 +17,15 @@ class Game < ApplicationRecord
   end
 
   def advance
+    puts("advance")
+  end
 
+  def move_lock?
+    puts("move lock")
+  end
+
+  def place_lock?
+    puts("place lock")
   end
   
 end
