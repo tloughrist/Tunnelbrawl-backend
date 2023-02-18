@@ -389,7 +389,10 @@ class Board < ApplicationRecord
   end
 
   def queen
-    
+    #find queening players
+    #is space in camp? how_much : proceed
+      #how much == 1? promote : highlight spots for placement
+    #remain queening
   end
 
   def show_placement(piece_loc)
