@@ -147,6 +147,7 @@ class Board < ApplicationRecord
     def pawn_step(start, disp, color)
       pos = start
       move_array = []
+      capture_array = []
       if in_bounds(pos + disp) && !occupied(pos + disp)
         move_array << pos + disp
       else
@@ -201,21 +202,27 @@ class Board < ApplicationRecord
           slide_hsh[:moves].each {|move| moves_array << "loc#{move.to_s}"}
           slide_hsh[:captures].each {|capture| captures_array << "loc#{capture.to_s}"}
         end
-      else
+      elsif move_func == "pawn_slide"
         disp_arr.each do |disp|
           pslide_hsh = pawn_slide(start, disp, color)
           pslide_hsh[:moves].each {|move| moves_array << "loc#{move.to_s}"}
           pslide_hsh[:captures].each {|capture| captures_array << "loc#{capture.to_s}"}
         end
+      else
+        disp_arr.each do |disp|
+          pstep_hsh = pawn_step(start, disp, color)
+          pstep_hsh[:moves].each {|move| moves_array << "loc#{move.to_s}"}
+          pstep_hsh[:captures].each {|capture| captures_array << "loc#{capture.to_s}"}
+        end
       end
-      {moves: moves_array.uniq, captures: captures_array.uniq}
+        {moves: moves_array.uniq, captures: captures_array.uniq}
     end
 
     def pawn_move(start, color, disp_arr, active_status)
       if active_status == "s"
         move(start, color, disp_arr, "pawn_slide")
       else
-        move(start, color, disp_arr, "step")
+        move(start, color, disp_arr, "pawn_step")
       end
     end
 
@@ -392,7 +399,8 @@ class Board < ApplicationRecord
     #find queening players
     #is space in camp? how_much : proceed
       #how much == 1? promote : highlight spots for placement
-    #remain queening
+    #remain queening  
+    puts("I'm a queen")
   end
 
   def show_placement(piece_loc)
