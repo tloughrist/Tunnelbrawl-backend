@@ -54,9 +54,9 @@ class Board < ApplicationRecord
 
   def close_camp(color, locations)
     if color == "green"
-      locations[8..11].each{|loc| self.update( loc => "xx_s_highlight--none" )}
+      locations[8..11].each{|loc| self.update( loc => "xx_s_highlight--block" )}
     else
-      locations[12..15].each{|loc| self.update( loc => "xx_s_highlight--none" )}
+      locations[12..15].each{|loc| self.update( loc => "xx_s_highlight--block" )}
     end
   end
 
@@ -99,10 +99,10 @@ class Board < ApplicationRecord
   end
 
   def legal_moves(piece_loc)
-    active_space = self.attributes.select {|k,v| k.to_s == piece_loc}
-    active_loc = active_space.keys.map {|key| key.to_s[3..6]}[0].to_i
-    active_piece = active_space.values.map {|value| value.to_s[0..1]}[0]
-    active_status = active_space.values.map {|value| value.to_s[3]}[0]
+    active_space = self[piece_loc.to_sym]
+    active_loc = piece_loc[3..6].to_i
+    active_piece = active_space.to_s[0..1]
+    active_status = active_space.to_s[3]
     
     def slide(start, disp, color)
       pos = start
@@ -263,7 +263,7 @@ class Board < ApplicationRecord
       end
     end
 
-    def move_piece(active_loc, active_piece, active_status)
+    def show_moves(active_loc, active_piece, active_status)
       case active_piece[1]
       when "r"
         rook(active_loc, active_piece[0])
@@ -282,48 +282,78 @@ class Board < ApplicationRecord
       end
     end
  
-    legal_hsh = move_piece(active_loc, active_piece, active_status)
+    legal_hsh = show_moves(active_loc, active_piece, active_status)
+  end
 
+  def legal_places(piece_loc)
+    color = self.game[:turn]
+    empties = self.camp(color).select {|k,v| v.to_s[0..1] == "em"}
+    empties.keys.each {|key| empties[key] = "#{empties[key].to_s[0..15]}move"}
+    self.update(empties)
+    legal_placement = empties.keys.each {|key| key.to_s}
+    {moves: legal_placement, captures: []}
+  end
+
+  def is_legal?(start_loc, end_loc, user_id) 
+    turn = self.game[:turn]
+    phase = self.game[:phase]
+    player = self.game.players.select {|player| player[:user_id] == user_id}
+    piece = self.attributes.select {|k,v| k.to_s == start_loc}
+    piece_color = piece[start_loc][0]
+    if turn == player[0][:color] && player[0][:color][0] == piece_color
+      if is_hand?(start_loc) && phase == "place"
+        legal_hsh = legal_places(start_loc)
+      elsif !is_hand?(start_loc) && phase == "move"
+        legal_hsh = legal_moves(start_loc)
+      end
+      legal_movement = *legal_hsh[:moves], *legal_hsh[:captures]
+      legal_movement.include?(end_loc)
+    else
+      false
+    end
+  end
+
+  def show_legal(piece_loc)
+    if is_hand?(piece_loc)
+      legal_hsh = legal_places(piece_loc)
+    else
+      legal_hsh = legal_moves(piece_loc)
+    end
     legal_moves_keys = legal_hsh[:moves].map {|move| move.to_sym}
     legal_captures_keys = legal_hsh[:captures].map {|capture| capture.to_sym}
-    
-    legal_moves_keys.each {|key| self.update(self[:key] => "#{self[:key].to_s[0..15]}move")}
-    legal_captures_keys.each {|key| self.update(self[:key] => "#{self[:key].to_s[0..15]}capture")}
+    self[piece_loc.to_sym] = "#{self[piece_loc.to_sym].to_s[0..15]}active"
 
-    legal_hsh
+    legal_moves_keys.each {|key| self[key] = "#{self[key].to_s[0..15]}move"}
+    legal_captures_keys.each {|key| self[key] = "#{self[key].to_s[0..15]}capture"}
+
+    self
   end
 
   def clear
     target_spaces = self.attributes.select {|k,v| v.to_s[16..-1] == "active" || v.to_s[16..-1] == "move" || v.to_s[16..-1] == "capture"}
     cleared_spaces = target_spaces.each {|k,v| v[16..-1] = "none"}
-    cleared_spaces.each {|space| self.update(space)}
+    self.update(cleared_spaces)
     self
   end
 
-  def move(start_loc, end_loc)
-    legal_moves = *self.legal_moves(start_loc)[:moves], *self.legal_moves(start_loc)[:captures]
-    self.clear
-    if legal_moves.include?(end_loc)
+  def move_piece(start_loc, end_loc, user_id)
+    if is_legal?(start_loc, end_loc, user_id)
       active_piece = self.attributes.select {|k,v| k.to_s == start_loc}
       target = self.attributes.select {|k,v| k.to_s == end_loc}
-      self.capture(target[end_loc])
+      capture(target.values[0])
       active_content = active_piece[start_loc]
       active_content["_s_"] = "_a_"
       target[end_loc] = active_content
       active_piece[start_loc] = "em_s_highlight--none"
       self.update(active_piece)
       self.update(target)
-      #camp = self.camp.select {|k,v| v == "em_s_highlight--none"} 
-      #if camp.size == 0
-      #  self.game.advance
-      #end
+      true
     else
-      puts("error: illegal move")
+      false
     end
   end
 
   def capture(piece)
-    puts piece
     game = self.game
     if piece != "em_s_highlight--none"
       def bury(color)
@@ -345,17 +375,27 @@ class Board < ApplicationRecord
       piece
     end
     if piece[1] == "k"
-      self.king
+      self.king_cap
     end
   end
 
-  def king
+  def king_cap
+    #is queen on board? remove queen : proceed
+    #is space in camp? how_much : proceed
+      #how much == 1? promote : highlight spots for placement
+    #is camp all blocked? select block for replacement : proceed
+    #assign player queening
     puts("take queen")
   end
 
+  def queen
+    
+  end
+
   def show_placement(piece_loc)
-    if self.is_hand?(piece_loc)
-      empties = self.camp.select {|k,v| v.to_s[0..1] == "em"}
+    if is_hand?(piece_loc)
+      color = self.game[:turn]
+      empties = self.camp(color).select {|k,v| v.to_s[0..1] == "em"}
       highlit_empties = empties.each {|k,v| v = "#{v.to_s[0..15]}move"}
       highlit_empties.each {|hash| self.update(hash)}
       open_locs = empties.keys
@@ -377,7 +417,6 @@ class Board < ApplicationRecord
     else
       puts("error: illegal placement")
     end
-
   end
 
   def is_hand?(loc)
@@ -394,8 +433,7 @@ class Board < ApplicationRecord
     end
   end
 
-  def camp
-    color = self.game[:turn]
+  def camp(color)
     case color
     when "red"
       self.slice(:loc21, :loc31, :loc41, :loc51)
@@ -405,6 +443,28 @@ class Board < ApplicationRecord
       self.slice(:loc26, :loc36, :loc46, :loc56)
     when "yellow"
       self.slice(:loc62, :loc63, :loc64, :loc65)
+    end
+  end
+
+  def fill_camp
+    hands = ["loc101", "loc102", "loc103", "loc104", "loc201", "loc202", "loc203", "loc204", "loc301", "loc302", "loc303", "loc304", "loc401", "loc402", "loc403", "loc404"]
+    empty_hands = hands.select {|loc| self[loc.to_sym] == "em_s_highlight--none"}
+    def block(color)
+      empties = self.camp(color).select {|k,v| v.to_s[0..1] == "em"}
+      highlit_empties = empties.each {|k,v| v = "xx_s_highlight--blocked"}
+      highlit_empties.each {|hash| self.update(hash)}
+    end
+    empty_hands.each do |loc|
+      case loc[3]
+      when "1"
+        block("red")
+      when "2"
+        block("green")
+      when "3"
+        block("blue")
+      when "4"
+        block("yellow")
+      end
     end
   end
 

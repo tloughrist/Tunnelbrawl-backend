@@ -22,7 +22,7 @@ class BoardsController < ApplicationController
     game = board.game
     players = game.players
     if players.map{|player| player.user_id.to_i}.include?(session[:user_id])
-      board.legal_moves(params[:active_piece])
+      board.show_legal(params[:active_piece])
       package = game.package
       render json: package, status: :accepted
     else
@@ -44,8 +44,23 @@ class BoardsController < ApplicationController
   end
 
   def move_piece
-#params: start loc, end loc
-  end
+    board = Board.find(params[:board_id])
+    game = board.game
+    players = game.players
+    if players.map{|player| player.user_id.to_i}.include?(session[:user_id])
+      legal = board.move_piece(params[:start_loc], params[:end_loc], session[:user_id])
+      if legal
+        board.queen
+        board.fill_camp
+        game.advance
+        package = game.package
+        render json: package, status: :accepted
+      else
+        return render json: { error: "Illegal move." }, status: :not_acceptable
+      end
+    else
+      return render json: { error: "Not authorized" }, status: :unauthorized
+    end  end
 
   private
 

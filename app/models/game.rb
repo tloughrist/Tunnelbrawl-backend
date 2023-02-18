@@ -17,15 +17,69 @@ class Game < ApplicationRecord
   end
 
   def advance
-    puts("advance")
+    turn = self[:turn]
+    phase = self[:phase]
+    round = self[:round]
+    no_players = self[:no_players]
+    if phase == "place"
+      self[:phase] = "move"
+      case no_players
+      when 2
+        case turn
+        when "red"
+          self.update({"turn" => "blue"})
+          return
+        else
+          self.update({"turn" => "red"})
+          self.update({"round" => round + 1})
+        end
+      when 3
+        case turn
+        when "red"
+          self.update({"turn" => "green"})
+        when "green"
+          self.update({"turn" => "blue"})
+        else
+          self.update({"turn" => "red"})
+          self.update({"round" => round + 1})
+        end
+      when 4
+        case turn
+        when "red"
+          self.update({"turn" => "green"})
+        when "green"
+          self.update({"turn" => "blue"})
+        when "blue"
+          self.update({"turn" => "yellow"})
+        else
+          self.update({"turn" => "red"})
+          self.update({"round" => round + 1})
+        end
+      end
+      move_lock?(self[:turn]) ? self.advance : self
+    else
+      self.update({"phase" => "place"})
+      place_lock?(self[:turn]) ? self.advance : self
+    end
   end
 
-  def move_lock?
-    puts("move lock")
+  def move_lock?(turn)
+    board = self.board
+    pieces = board.attributes.select {|k,v| v.to_s[0] == turn[0]}
+    piece_locs = pieces.keys
+    avail_moves = piece_locs.each do |loc|
+      legal_hsh = board.legal_moves(loc.to_s)
+      legal_movement = *legal_hsh[:moves], *legal_hsh[:captures]
+      legal_movement.size
+    end
+    !avail_moves.any?{|x| x > 0}
   end
 
-  def place_lock?
-    puts("place lock")
+  def place_lock?(turn)
+    board = self.board
+    camp = board.camp
+    empties = camp.select {|k,v| v.to_s[0..1] == "em"}
+    empties.size == 0
   end
   
 end
