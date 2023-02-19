@@ -308,6 +308,7 @@ class Board < ApplicationRecord
     piece = self.attributes.select {|k,v| k.to_s == start_loc}
     piece_color = piece[start_loc][0]
     if turn == player[0][:color] && player[0][:color][0] == piece_color
+      legal_hsh = {}
       if is_hand?(start_loc) && phase == "place"
         legal_hsh = legal_places(start_loc)
       elsif !is_hand?(start_loc) && phase == "move"
@@ -354,6 +355,7 @@ class Board < ApplicationRecord
       active_piece[start_loc] = "em_s_highlight--none"
       self.update(active_piece)
       self.update(target)
+      is_hand?(start_loc) ? self.draw(start_loc) : nil
       true
     else
       false
@@ -363,20 +365,20 @@ class Board < ApplicationRecord
   def capture(piece)
     game = self.game
     if piece != "em_s_highlight--none"
-      def bury(color)
+      def bury(color, piece)
         graves = self["#{color}_taken".to_sym]
         graves << piece
         self["#{color}_taken".to_sym] = graves
       end
       case game[:turn]
       when "red"
-        bury("red")
+        bury("red", piece)
       when "green"
-        bury("green")
+        bury("green", piece)
       when "blue"
-        bury("blue")
+        bury("blue", piece)
       when "yellow"
-        bury("yellow")
+        bury("yellow", piece)
       end
     else
       piece
@@ -395,7 +397,7 @@ class Board < ApplicationRecord
     puts("take queen")
   end
 
-  def queen
+  def queen_promote
     #find queening players
     #is space in camp? how_much : proceed
       #how much == 1? promote : highlight spots for placement
@@ -442,6 +444,11 @@ class Board < ApplicationRecord
     when "yellow"
       ["loc401", "loc402", "loc403", "loc404"].include?(loc)
     end
+  end
+
+  def is_board?(loc)
+    loc_num = loc[3..-1]
+    loc_num.to_i > 11 && loc_num.to_i < 66
   end
 
   def camp(color)
@@ -497,7 +504,7 @@ class Board < ApplicationRecord
     remaining_cards = self.deck.select {|k,v| v.to_s[0..1] != "em"}
     drawn = remaining_cards[remaining_cards.keys[0].to_sym]
     self[remaining_cards.keys[0].to_sym] = "em_s_highlight--none"
-    self[loc.to_sym] = drawn
+    self.update(loc => drawn) 
     self
   end
 

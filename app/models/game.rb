@@ -65,19 +65,20 @@ class Game < ApplicationRecord
 
   def move_lock?(turn)
     board = self.board
-    pieces = board.attributes.select {|k,v| v.to_s[0] == turn[0]}
+    pieces = board.attributes.select {|k,v| (v.to_s[0] == turn[0]) && board.is_board?(k.to_s)}
     piece_locs = pieces.keys
-    avail_moves = piece_locs.each do |loc|
+    avail_moves = []
+    piece_locs.each do |loc|
       legal_hsh = board.legal_moves(loc.to_s)
       legal_movement = *legal_hsh[:moves], *legal_hsh[:captures]
-      legal_movement.size
+      avail_moves << legal_movement.size
     end
     !avail_moves.any?{|x| x > 0}
   end
 
   def place_lock?(turn)
     board = self.board
-    camp = board.camp
+    camp = board.camp(turn)
     empties = camp.select {|k,v| v.to_s[0..1] == "em"}
     empties.size == 0
   end
