@@ -50,7 +50,7 @@ class BoardsController < ApplicationController
     if players.map{|player| player.user_id.to_i}.include?(session[:user_id])
       legal = board.move_piece(params[:start_loc], params[:end_loc], session[:user_id])
       if legal
-        board.queen_promote
+        board.queen_defect
         board.fill_camp
         game.advance
         package = game.package

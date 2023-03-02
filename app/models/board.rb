@@ -144,15 +144,26 @@ class Board < ApplicationRecord
       {moves: move_array, captures: capture_array}
     end
 
+    def king_step(start, disp, color)
+      pos = start
+      move_array = []
+      capture_array = []
+      if in_bounds(pos + disp) && !occupied(pos + disp)
+        move_array << pos + disp
+      elsif in_bounds(pos + disp) && occupied(pos + disp)
+        capture_array << pos + disp
+      end
+      {moves: move_array, captures: capture_array}
+    end
+
     def pawn_step(start, disp, color)
       pos = start
       move_array = []
       capture_array = []
       if in_bounds(pos + disp) && !occupied(pos + disp)
         move_array << pos + disp
-      else
-        capture_array = pawn_capture(start, color)
       end
+      capture_array = pawn_capture(start, color)
       {moves: move_array, captures: capture_array}
     end
 
@@ -202,6 +213,12 @@ class Board < ApplicationRecord
           slide_hsh[:moves].each {|move| moves_array << "loc#{move.to_s}"}
           slide_hsh[:captures].each {|capture| captures_array << "loc#{capture.to_s}"}
         end
+      elsif move_func == "king_step"
+        disp_arr.each do |disp|
+          step_hsh = king_step(start, disp, color)
+          step_hsh[:moves].each {|move| moves_array << "loc#{move.to_s}"}
+          step_hsh[:captures].each {|capture| captures_array << "loc#{capture.to_s}"}
+        end
       elsif move_func == "pawn_slide"
         disp_arr.each do |disp|
           pslide_hsh = pawn_slide(start, disp, color)
@@ -232,7 +249,7 @@ class Board < ApplicationRecord
     end
 
     def knight(start, color)
-      disp_arr = [-12, -8, -21, -18, 12, 8, 21, 18]
+      disp_arr = [-12, -8, -21, -19, 12, 8, 21, 19]
       move(start, color, disp_arr, "step")
     end
 
@@ -248,7 +265,7 @@ class Board < ApplicationRecord
 
     def king(start, color)
       disp_arr = [-11, 11, -9, 9, -10, 10, -1, 1]
-      move(start, color, disp_arr, "step")
+      move(start, color, disp_arr, "king_step")
     end
 
     def pawn(start, color, active_status)
@@ -307,7 +324,7 @@ class Board < ApplicationRecord
     player = self.game.players.select {|player| player[:user_id] == user_id}
     piece = self.attributes.select {|k,v| k.to_s == start_loc}
     piece_color = piece[start_loc][0]
-    if turn == player[0][:color] && player[0][:color][0] == piece_color
+    #if turn == player[0][:color] && player[0][:color][0] == piece_color
       legal_hsh = {}
       if is_hand?(start_loc) && phase == "place"
         legal_hsh = legal_places(start_loc)
@@ -316,9 +333,9 @@ class Board < ApplicationRecord
       end
       legal_movement = *legal_hsh[:moves], *legal_hsh[:captures]
       legal_movement.include?(end_loc)
-    else
-      false
-    end
+    #else
+    #  false
+    #end
   end
 
   def show_legal(piece_loc)
@@ -350,7 +367,9 @@ class Board < ApplicationRecord
       target = self.attributes.select {|k,v| k.to_s == end_loc}
       capture(target.values[0])
       active_content = active_piece[start_loc]
-      active_content["_s_"] = "_a_"
+      if !is_hand?(start_loc)
+        active_content[/_\w_/] = "_a_"
+      end
       target[end_loc] = active_content
       active_piece[start_loc] = "em_s_highlight--none"
       self.update(active_piece)
@@ -384,25 +403,46 @@ class Board < ApplicationRecord
       piece
     end
     if piece[1] == "k"
-      self.king_cap
+      color = piece[0]
+      self.king_cap(color)
     end
   end
 
-  def king_cap
-    #is queen on board? remove queen : proceed
-    #is space in camp? how_much : proceed
-      #how much == 1? promote : highlight spots for placement
-    #is camp all blocked? select block for replacement : proceed
-    #assign player queening
-    puts("take queen")
+  def king_cap(color)
+    if self.is_done?
+      self.complete
+    else
+      self.attributes.each do |k,v|
+        if (is_camp?(k) || is_board?(k) || is_deck?(k)) && v[0] == color
+          self.update({k.to_sym => "em_s_highlight--none"})
+        end
+      end
+      self.fill_camp
+      capturing_player = self.players.find_by color: self.game.turn
+      capturing_player.update({:queening => true})
+    end
   end
 
-  def queen_promote
-    #find queening players
-    #is space in camp? how_much : proceed
-      #how much == 1? promote : highlight spots for placement
-    #remain queening  
-    puts("I'm a queen")
+  def queen_defect
+    players = self.players.where queening: true
+    if players.size > 0
+      players.each do |player|
+        empties = self.camp(player.color).select {|k,v| v.to_s[0..1] == "em"}
+        blocks = self.camp(player.color).select {|k,v| v.to_s[0..1] == "xx"}
+        if empties.size > 0
+          square = empties.keys[rand(empties.keys.size)]
+          self.update({square.to_sym => `#{player.color[0]}q_s_highlight--none`})
+          player.update({:queening => false})
+        elsif blocks.size == 4
+          square = blocks.keys[rand(empties.keys.size)]
+          self.update({square => `#{player.color[0]}q_s_highlight--none`})
+          player.update({:queening => false})
+        else
+          return
+        end
+      end
+    end
+    return
   end
 
   def show_placement(piece_loc)
@@ -438,17 +478,36 @@ class Board < ApplicationRecord
     when "red"
       ["loc101", "loc102", "loc103", "loc104"].include?(loc)
     when "green"
-      ["loc201", "loc202", "loc203", "loc204"].include?(loc)
-    when "blue"
       ["loc301", "loc302", "loc303", "loc304"].include?(loc)
+    when "blue"
+      ["loc201", "loc202", "loc203", "loc204"].include?(loc)
     when "yellow"
       ["loc401", "loc402", "loc403", "loc404"].include?(loc)
     end
   end
 
+  def is_camp?(loc)
+    color = self.game[:turn]
+    case color
+    when "red"
+      ["loc21", "loc31", "loc41", "loc51"].include?(loc)
+    when "green"
+      ["loc12", "loc13", "loc14", "loc15"].include?(loc)
+    when "blue"
+      ["loc26", "loc36", "loc46", "loc56"].include?(loc)
+    when "yellow"
+      ["loc62", "loc63", "loc64", "loc65"].include?(loc)
+    end
+  end
+
   def is_board?(loc)
-    loc_num = loc[3..-1]
-    loc_num.to_i > 11 && loc_num.to_i < 66
+    loc_num = loc[3..-1].to_i
+    loc_num > 11 && loc_num < 66
+  end 
+
+  def is_deck?(loc)
+    loc_num = loc[3..-1].to_i
+    loc_num > 110 && loc_num < 200 || loc_num > 210 && loc_num < 300 || loc_num > 310 && loc_num < 400 || loc_num > 410 && loc_num < 500
   end
 
   def camp(color)
@@ -476,9 +535,9 @@ class Board < ApplicationRecord
       case loc[3]
       when "1"
         block("red")
-      when "2"
-        block("green")
       when "3"
+        block("green")
+      when "2"
         block("blue")
       when "4"
         block("yellow")
@@ -492,9 +551,9 @@ class Board < ApplicationRecord
     when "red"
       self.slice(:loc111, :loc112, :loc113, :loc114, :loc115, :loc116, :loc117, :loc118)
     when "green"
-      self.slice(:loc211, :loc212, :loc213, :loc214, :loc215, :loc216, :loc217, :loc218)
-    when "blue"
       self.slice(:loc311, :loc312, :loc313, :loc314, :loc315, :loc316, :loc317, :loc318)
+    when "blue"
+      self.slice(:loc211, :loc212, :loc213, :loc214, :loc215, :loc216, :loc217, :loc218)
     when "yellow"
       self.slice(:loc411, :loc412, :loc413, :loc414, :loc415, :loc416, :loc417, :loc418)
     end
@@ -506,6 +565,33 @@ class Board < ApplicationRecord
     self[remaining_cards.keys[0].to_sym] = "em_s_highlight--none"
     self.update(loc => drawn) 
     self
+  end
+  
+  def is_done?
+    no_players = self.game[:no_players]
+    case no_players
+    when 2
+      true
+    when 3
+      kings_taken_red = self[:red_taken].select {|piece| piece[1] == "k"}
+      kings_taken_green = self[:green_taken].select {|piece| piece[1] == "k"}
+      kings_taken_blue = self[:blue_taken].select {|piece| piece[1] == "k"}
+      no_kings_taken = kings_taken_red.size + kings_taken_green.size + kings_taken_blue.size
+      no_kings_taken == 2
+    when 4
+      kings_taken_red = self[:red_taken].select {|piece| piece[1] == "k"}
+      kings_taken_green = self[:green_taken].select {|piece| piece[1] == "k"}
+      kings_taken_blue = self[:blue_taken].select {|piece| piece[1] == "k"}
+      kings_taken_yellow = self[:yellow_taken].select {|piece| piece[1] == "k"}
+      no_kings_taken = kings_taken_red.size + kings_taken_green.size + kings_taken_blue.size + kings_taken_yellow.size
+      no_kings_taken == 3
+    end
+  end
+
+  def complete
+    self.game.update(:status => "complete")
+    winner = self.players.find(:color == self.game.turn)
+    winner.update(:status => "winner")
   end
 
 end
