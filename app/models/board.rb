@@ -10,6 +10,7 @@ class Board < ApplicationRecord
   
   def begin_game(no_players)
     locs = ["loc21", "loc31", "loc41", "loc51", "loc26", "loc36", "loc46", "loc56", "loc12", "loc13", "loc14", "loc15", "loc62", "loc63", "loc64", "loc65", "loc101", "loc102", "loc103", "loc104", "loc111", "loc112", "loc113", "loc114", "loc115", "loc116", "loc117", "loc118", "loc201", "loc202", "loc203", "loc204", "loc211", "loc212", "loc213", "loc214", "loc215", "loc216", "loc217", "loc218", "loc301", "loc302", "loc303", "loc304", "loc311", "loc312", "loc313", "loc314", "loc315", "loc316", "loc317", "loc318", "loc401", "loc402", "loc403", "loc404", "loc411", "loc412", "loc413", "loc414", "loc415", "loc416", "loc417", "loc418", "loc22", "loc23", "loc24", "loc25", "loc32", "loc33", "loc34", "loc35", "loc42", "loc43", "loc44", "loc45", "loc52", "loc53", "loc54", "loc55" ] 
+    self.empty_graves
     if no_players == 2
       self.place_pawns("red", locs)
       self.place_pawns("blue", locs)
@@ -40,6 +41,10 @@ class Board < ApplicationRecord
     end
   end
 
+  def empty_graves
+    self.update({red_taken: [], green_taken: [], blue_taken: [], yellow_taken: []})
+  end
+
   def place_pawns(color, locations)
     if color == "red"
       locations[0..3].each{|loc| self.update( loc => "rp_s_highlight--none" )}
@@ -54,9 +59,9 @@ class Board < ApplicationRecord
 
   def close_camp(color, locations)
     if color == "green"
-      locations[8..11].each{|loc| self.update( loc => "xx_s_highlight--block" )}
+      locations[8..11].each{|loc| self.update( loc => "xx_s_highlight--none" )}
     else
-      locations[12..15].each{|loc| self.update( loc => "xx_s_highlight--block" )}
+      locations[12..15].each{|loc| self.update( loc => "xx_s_highlight--none" )}
     end
   end
 
@@ -191,7 +196,7 @@ class Board < ApplicationRecord
     def opponent(loc, color)
       loc_key = "loc#{loc.to_s}"
       target_space = self[loc_key.to_sym]
-      target_space[0] != "e" && target_space[0] != color
+      target_space[0] != "e" && target_space[0] != color && target_space[0] != "x"
     end
     
     def in_bounds(loc)
@@ -326,9 +331,10 @@ class Board < ApplicationRecord
     piece_color = piece[start_loc][0]
     #if turn == player[0][:color] && player[0][:color][0] == piece_color
       legal_hsh = {}
-      if is_hand?(start_loc) && phase == "place"
+      color = self.game[:turn]
+      if is_hand?(start_loc, color) && phase == "place"
         legal_hsh = legal_places(start_loc)
-      elsif !is_hand?(start_loc) && phase == "move"
+      elsif !is_hand?(start_loc, color) && phase == "move"
         legal_hsh = legal_moves(start_loc)
       end
       legal_movement = *legal_hsh[:moves], *legal_hsh[:captures]
@@ -339,7 +345,8 @@ class Board < ApplicationRecord
   end
 
   def show_legal(piece_loc)
-    if is_hand?(piece_loc)
+    color = self.game[:turn]
+    if is_hand?(piece_loc, color)
       legal_hsh = legal_places(piece_loc)
     else
       legal_hsh = legal_moves(piece_loc)
@@ -363,18 +370,19 @@ class Board < ApplicationRecord
 
   def move_piece(start_loc, end_loc, user_id)
     if is_legal?(start_loc, end_loc, user_id)
+      color = self.game[:turn]
       active_piece = self.attributes.select {|k,v| k.to_s == start_loc}
       target = self.attributes.select {|k,v| k.to_s == end_loc}
       capture(target.values[0])
       active_content = active_piece[start_loc]
-      if !is_hand?(start_loc)
+      if !is_hand?(start_loc, color)
         active_content[/_\w_/] = "_a_"
       end
       target[end_loc] = active_content
       active_piece[start_loc] = "em_s_highlight--none"
       self.update(active_piece)
       self.update(target)
-      is_hand?(start_loc) ? self.draw(start_loc) : nil
+      is_hand?(start_loc, color) ? self.draw(start_loc) : nil
       true
     else
       false
@@ -410,10 +418,11 @@ class Board < ApplicationRecord
 
   def king_cap(color)
     if self.is_done?
-      self.complete
+      winner = self.players.find_by color: self.game.turn
+      self.complete(winner)
     else
       self.attributes.each do |k,v|
-        if (is_camp?(k) || is_board?(k) || is_deck?(k)) && v[0] == color
+        if (is_board?(k) || is_deck?(k) || is_hand?(k, color) || is_camp?(k, color)) && v[0] == color
           self.update({k.to_sym => "em_s_highlight--none"})
         end
       end
@@ -431,12 +440,12 @@ class Board < ApplicationRecord
         blocks = self.camp(player.color).select {|k,v| v.to_s[0..1] == "xx"}
         if empties.size > 0
           square = empties.keys[rand(empties.keys.size)]
-          self.update({square.to_sym => `#{player.color[0]}q_s_highlight--none`})
+          self.update({square.to_sym => "#{player.color[0]}q_s_highlight--none"})
           player.update({:queening => false})
         elsif blocks.size == 4
           square = blocks.keys[rand(empties.keys.size)]
-          self.update({square => `#{player.color[0]}q_s_highlight--none`})
-          player.update({:queening => false})
+          self.update({square.to_sym => "#{player.color[0]}q_s_highlight--none"})
+          player.update({queening: false})
         else
           return
         end
@@ -446,8 +455,8 @@ class Board < ApplicationRecord
   end
 
   def show_placement(piece_loc)
-    if is_hand?(piece_loc)
-      color = self.game[:turn]
+    color = self.game[:turn]
+    if is_hand?(piece_loc, color)
       empties = self.camp(color).select {|k,v| v.to_s[0..1] == "em"}
       highlit_empties = empties.each {|k,v| v = "#{v.to_s[0..15]}move"}
       highlit_empties.each {|hash| self.update(hash)}
@@ -472,30 +481,28 @@ class Board < ApplicationRecord
     end
   end
 
-  def is_hand?(loc)
-    color = self.game[:turn]
-    case color
-    when "red"
+  def is_hand?(loc, color)
+    case color[0]
+    when "r"
       ["loc101", "loc102", "loc103", "loc104"].include?(loc)
-    when "green"
+    when "g"
       ["loc301", "loc302", "loc303", "loc304"].include?(loc)
-    when "blue"
+    when "b"
       ["loc201", "loc202", "loc203", "loc204"].include?(loc)
-    when "yellow"
+    when "y"
       ["loc401", "loc402", "loc403", "loc404"].include?(loc)
     end
   end
 
-  def is_camp?(loc)
-    color = self.game[:turn]
-    case color
-    when "red"
+  def is_camp?(loc, color)
+    case color[0]
+    when "r"
       ["loc21", "loc31", "loc41", "loc51"].include?(loc)
-    when "green"
+    when "g"
       ["loc12", "loc13", "loc14", "loc15"].include?(loc)
-    when "blue"
+    when "b"
       ["loc26", "loc36", "loc46", "loc56"].include?(loc)
-    when "yellow"
+    when "y"
       ["loc62", "loc63", "loc64", "loc65"].include?(loc)
     end
   end
@@ -524,23 +531,33 @@ class Board < ApplicationRecord
   end
 
   def fill_camp
-    hands = ["loc101", "loc102", "loc103", "loc104", "loc201", "loc202", "loc203", "loc204", "loc301", "loc302", "loc303", "loc304", "loc401", "loc402", "loc403", "loc404"]
-    empty_hands = hands.select {|loc| self[loc.to_sym] == "em_s_highlight--none"}
+    red_hand = ["loc101", "loc102", "loc103", "loc104"]
+    blue_hand = ["loc201", "loc202", "loc203", "loc204"]
+    green_hand = ["loc301", "loc302", "loc303", "loc304"]
+    yellow_hand = ["loc401", "loc402", "loc403", "loc404"]
+    empties_red_hand = red_hand.select {|loc| self[loc.to_sym] == "em_s_highlight--none"}
+    empties_blue_hand = blue_hand.select {|loc| self[loc.to_sym] == "em_s_highlight--none"}
+    empties_green_hand = green_hand.select {|loc| self[loc.to_sym] == "em_s_highlight--none"}
+    empties_yellow_hand = yellow_hand.select {|loc| self[loc.to_sym] == "em_s_highlight--none"}
+    empty_hands = [empties_red_hand, empties_blue_hand, empties_green_hand, empties_yellow_hand]
     def block(color)
       empties = self.camp(color).select {|k,v| v.to_s[0..1] == "em"}
-      highlit_empties = empties.each {|k,v| v = "xx_s_highlight--blocked"}
-      highlit_empties.each {|hash| self.update(hash)}
+      empties.keys.each {|key| self.update({key.to_sym => "xx_s_highlight--none"})}
     end
-    empty_hands.each do |loc|
-      case loc[3]
-      when "1"
-        block("red")
-      when "3"
-        block("green")
-      when "2"
-        block("blue")
-      when "4"
-        block("yellow")
+    empty_hands.each do |hand|
+      if hand.size == 4
+        hand.each do |loc|
+          case loc[3]
+          when "1"
+            block("red")
+          when "3"
+            block("green")
+          when "2"
+            block("blue")
+          when "4"
+            block("yellow")
+          end
+        end
       end
     end
   end
@@ -561,9 +578,11 @@ class Board < ApplicationRecord
 
   def draw(loc)
     remaining_cards = self.deck.select {|k,v| v.to_s[0..1] != "em"}
-    drawn = remaining_cards[remaining_cards.keys[0].to_sym]
-    self[remaining_cards.keys[0].to_sym] = "em_s_highlight--none"
-    self.update(loc => drawn) 
+    if remaining_cards.size > 0
+      drawn = remaining_cards[remaining_cards.keys[0].to_sym]
+      self[remaining_cards.keys[0].to_sym] = "em_s_highlight--none"
+      self.update(loc => drawn)
+    end
     self
   end
   
@@ -588,9 +607,8 @@ class Board < ApplicationRecord
     end
   end
 
-  def complete
+  def complete(winner)
     self.game.update(:status => "complete")
-    winner = self.players.find(:color == self.game.turn)
     winner.update(:status => "winner")
   end
 

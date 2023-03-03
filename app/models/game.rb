@@ -59,6 +59,7 @@ class Game < ApplicationRecord
       move_lock?(self[:turn]) ? self.advance : self
     else
       self.update({"phase" => "place"})
+      self.board.queen_defect
       place_lock?(self[:turn]) ? self.advance : self
     end
   end

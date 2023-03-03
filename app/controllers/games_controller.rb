@@ -37,6 +37,7 @@ class GamesController < ApplicationController
         board.begin_game(game.no_players)
         game.update(game_params)
         gamePackage = game.package
+        game.players.each {|player| player.update({queening: false, status: "active"})}
         render json: gamePackage, status: :accepted
       else
         render json: { errors: "Games require 2-4 players." }, status: :unprocessable_entity
