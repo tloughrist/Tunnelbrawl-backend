@@ -135,7 +135,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_07_224417) do
     t.bigint "game_id"
     t.string "status"
     t.string "color"
-    t.boolean "queening"
+    t.integer "queening"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["game_id"], name: "index_players_on_game_id"

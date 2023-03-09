@@ -14,6 +14,19 @@ class GamesController < ApplicationController
     end
   end
 
+  def get_public
+    games = Game.where(public: true, status: "pending")
+    vacancy_games = games.where("no_players < ?", 4)
+    current_user = User.find(params[:user_id])
+    no_user_vacancy_games = vacancy_games.select {|game| !game.users.include?(current_user)}
+    game_pkgs = no_user_vacancy_games.map do |game|
+      players = game.players.map {|player| player.user[:username]}
+      host = game.host[:username]
+      {**game.attributes, players: players, host: host}
+    end
+    render json: game_pkgs, status: :ok
+  end
+
   def update
     game = Game.find(params[:id])
     if game.players.map{|player| player.user_id.to_i}.include?(session[:user_id])
@@ -36,6 +49,7 @@ class GamesController < ApplicationController
       if game.no_players > 1
         board.begin_game(game.no_players)
         game.update(game_params)
+        game.update({status: "in progress"})
         gamePackage = game.package
         game.players.each {|player| player.update({queening: false, status: "active"})}
         render json: gamePackage, status: :accepted

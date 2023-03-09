@@ -5,7 +5,7 @@ class CreatePlayers < ActiveRecord::Migration[7.0]
       t.references :game, foreign_key: { to_table: :games }
       t.string :status
       t.string :color
-      t.boolean :queening
+      t.integer :queening
 
       t.timestamps
     end

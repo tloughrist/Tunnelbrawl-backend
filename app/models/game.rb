@@ -3,6 +3,7 @@ class Game < ApplicationRecord
   belongs_to :host, class_name: 'User'
   has_one :board, dependent: :destroy
   has_many :players, dependent: :destroy
+  has_many :users, through: :players
 
   validates :no_players, numericality: { less_than: 5 }, allow_blank: true
 
@@ -13,7 +14,10 @@ class Game < ApplicationRecord
   end
 
   def package
-    {game: {**self.attributes, host: self.host.username, players: self.players}, board: self.board}
+    player_arr = self.players.map do |player|
+      {id: player[:id], game_id: player[:game_id], user_id: player[:user_id], status: player[:status], color: player[:color], username: player.user[:username]}
+    end
+    {game: {**self.attributes, host: self.host[:username], players: player_arr}, board: self.board}
   end
 
   def advance

@@ -329,7 +329,7 @@ class Board < ApplicationRecord
     player = self.game.players.select {|player| player[:user_id] == user_id}
     piece = self.attributes.select {|k,v| k.to_s == start_loc}
     piece_color = piece[start_loc][0]
-    #if turn == player[0][:color] && player[0][:color][0] == piece_color
+    if turn == player[0][:color] && player[0][:color][0] == piece_color
       legal_hsh = {}
       color = self.game[:turn]
       if is_hand?(start_loc, color) && phase == "place"
@@ -339,9 +339,9 @@ class Board < ApplicationRecord
       end
       legal_movement = *legal_hsh[:moves], *legal_hsh[:captures]
       legal_movement.include?(end_loc)
-    #else
-    #  false
-    #end
+    else
+      false
+    end
   end
 
   def show_legal(piece_loc)
@@ -417,6 +417,8 @@ class Board < ApplicationRecord
   end
 
   def king_cap(color)
+    loser = self.players.find_by color: color
+    loser.update({status: "loser"})
     if self.is_done?
       winner = self.players.find_by color: self.game.turn
       self.complete(winner)
@@ -428,12 +430,12 @@ class Board < ApplicationRecord
       end
       self.fill_camp
       capturing_player = self.players.find_by color: self.game.turn
-      capturing_player.update({:queening => true})
+      capturing_player.update({:queening => capturing_player[:queening] + 1})
     end
   end
 
   def queen_defect
-    players = self.players.where queening: true
+    players = self.players.where("queening > ?", 0) 
     if players.size > 0
       players.each do |player|
         empties = self.camp(player.color).select {|k,v| v.to_s[0..1] == "em"}
@@ -441,11 +443,11 @@ class Board < ApplicationRecord
         if empties.size > 0
           square = empties.keys[rand(empties.keys.size)]
           self.update({square.to_sym => "#{player.color[0]}q_s_highlight--none"})
-          player.update({:queening => false})
+          player.update({:queening => player[:queening] - 1})
         elsif blocks.size == 4
           square = blocks.keys[rand(empties.keys.size)]
           self.update({square.to_sym => "#{player.color[0]}q_s_highlight--none"})
-          player.update({queening: false})
+          player.update({:queening => player[:queening] - 1})
         else
           return
         end

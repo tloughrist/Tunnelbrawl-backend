@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   put "boards/show_moves/:board_id", to: "boards#show_moves"
   put "boards/clear_highlights/:board_id", to: "boards#clear_highlights"
   put "boards/move_piece/:board_id", to: "boards#move_piece"
+  get "games/public/:user_id", to: "games#get_public"
   put "games/initialize/:game_id", to: "games#initialize_game"
   put "games/advance/:game_id", to: "games#advance"
 
