@@ -1,4 +1,4 @@
-class PlayersController < ApplicationController
+class PlayersController < SuperController
 
   before_action :authorize
 
@@ -10,13 +10,11 @@ class PlayersController < ApplicationController
         player = Player.create(user_id: params[:user_id], game_id: params[:game_id], color: "blue", queening: 0, status: "active")
       when "blue"
         player = Player.create(user_id: params[:user_id], game_id: params[:game_id], color: "green", queening: 0, status: "active")
-      when "green"
-        player = Player.create(user_id: params[:user_id], game_id: params[:game_id], color: "yellow", queening: 0, status: "active")
       else
-        player = Player.create(user_id: params[:user_id], game_id: params[:game_id], color: "red", queening: 0, status: "active")
+        player = Player.create(user_id: params[:user_id], game_id: params[:game_id], color: "yellow", queening: 0, status: "active")
       end
-    if player.valid?
-      render json: player, status: :created
+    if player.valid? && game.valid?
+      self.get_public_games
     else
       render json: { errors: player.errors.full_players }, status: :unprocessable_entity
     end

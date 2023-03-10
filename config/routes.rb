@@ -10,8 +10,8 @@ Rails.application.routes.draw do
   resources :games, only: [:create, :update, :destroy]
   resources :boards, only: [:update]
   resources :users, only: [:index, :update, :destroy]
-  resources :player, only: [:create, :update, :destroy]
-  resources :friendship, only: [:create, :update, :destroy]
+  resources :players, only: [:create, :update, :destroy]
+  resources :friendships, only: [:create, :update, :destroy]
 
   #custom routes
   get "users/:user_id/friends", to: "users#get_friends"

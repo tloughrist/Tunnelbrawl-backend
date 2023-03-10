@@ -1,11 +1,11 @@
-class GamesController < ApplicationController
+class GamesController < SuperController
 
   before_action :authorize
 
   def create
     game = Game.create(game_params)
     board = game.make_board
-    Player.create(user_id: game.host_id, game_id: game.id, color: "red")
+    Player.create(user_id: game.host_id, game_id: game.id, color: "red", status: "active", queening: 0)
     if game.valid?
       package = game.package
       render json: package, status: :created
@@ -15,16 +15,7 @@ class GamesController < ApplicationController
   end
 
   def get_public
-    games = Game.where(public: true, status: "pending")
-    vacancy_games = games.where("no_players < ?", 4)
-    current_user = User.find(params[:user_id])
-    no_user_vacancy_games = vacancy_games.select {|game| !game.users.include?(current_user)}
-    game_pkgs = no_user_vacancy_games.map do |game|
-      players = game.players.map {|player| player.user[:username]}
-      host = game.host[:username]
-      {**game.attributes, players: players, host: host}
-    end
-    render json: game_pkgs, status: :ok
+    self.get_public_games
   end
 
   def update
