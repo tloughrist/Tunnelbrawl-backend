@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   #custom routes
   get "users/:user_id/friends", to: "users#get_friends"
   get "users/:user_id/games", to: "users#get_games"
+  get "users/self", to: "users#self" 
   put "boards/show_moves/:board_id", to: "boards#show_moves"
   put "boards/clear_highlights/:board_id", to: "boards#clear_highlights"
   put "boards/move_piece/:board_id", to: "boards#move_piece"

@@ -56,7 +56,12 @@ class GamesController < SuperController
     game = Game.find(params[:id])
     if game.host.id.to_i == session[:user_id]
       game.destroy
-      head :no_content
+      user = User.find(session[:user_id])
+      games = user.games
+      gamePkgs = games.map{|game| game.package}
+      game_users = User.where(current_game: params[:id])
+      game_users.each{|user| user.update({current_game: "none"})}
+      return render json: gamePkgs, status: :accepted
     else
       return render json: { error: "Not authorized" }, status: :unauthorized
     end

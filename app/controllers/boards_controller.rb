@@ -24,6 +24,7 @@ class BoardsController < ApplicationController
     if players.map{|player| player.user_id.to_i}.include?(session[:user_id])
       board.show_legal(params[:active_piece])
       package = game.package
+      GamesChannel.broadcast_to(@game, render json: package)
       render json: package, status: :accepted
     else
       return render json: { error: "Not authorized" }, status: :unauthorized
@@ -37,6 +38,7 @@ class BoardsController < ApplicationController
     if players.map{|player| player.user_id.to_i}.include?(session[:user_id])
       board.clear
       package = game.package
+      GamesChannel.broadcast_to(@game, render json: package)
       render json: package, status: :accepted
     else
       return render json: { error: "Not authorized" }, status: :unauthorized
