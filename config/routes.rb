@@ -24,6 +24,9 @@ Rails.application.routes.draw do
   put "games/initialize/:game_id", to: "games#initialize_game"
   put "games/advance/:game_id", to: "games#advance"
 
+  #actioncable routing
+  mount ActionCable.server => '/cable'
+
   # Routing logic: fallback requests for React Router.
   # Leave this here to help deploy your app later!
   get "*path", to: "fallback#index", constraints: ->(req) { !req.xhr? && req.format.html? }

@@ -37,7 +37,9 @@ class GamesController < SuperController
     game = Game.find(params[:game_id])
     if game.host.id.to_i == session[:user_id]
       board = game.board
-      if game.no_players > 1
+      no_players = game.players.size
+      game.update({no_players: no_players})
+      if no_players > 1
         board.begin_game(game.no_players)
         game.update(game_params)
         game.update({status: "in progress"})

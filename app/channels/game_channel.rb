@@ -1,4 +1,4 @@
-class GamesChannel < ApplicationCable::Channel
+class GameChannel < ApplicationCable::Channel
 
   def subscribed
     game = Game.find(params[:id])
