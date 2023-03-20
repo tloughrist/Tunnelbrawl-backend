@@ -155,7 +155,7 @@ class Board < ApplicationRecord
       capture_array = []
       if in_bounds(pos + disp) && !occupied(pos + disp)
         move_array << pos + disp
-      elsif in_bounds(pos + disp) && occupied(pos + disp)
+      elsif in_bounds(pos + disp) && king_opponent(pos + disp)
         capture_array << pos + disp
       end
       {moves: move_array, captures: capture_array}
@@ -197,6 +197,12 @@ class Board < ApplicationRecord
       loc_key = "loc#{loc.to_s}"
       target_space = self[loc_key.to_sym]
       target_space[0] != "e" && target_space[0] != color && target_space[0] != "x"
+    end
+
+    def king_opponent(loc)
+      loc_key = "loc#{loc.to_s}"
+      target_space = self[loc_key.to_sym]
+      target_space[0] != "e" && target_space[0] != "x"
     end
     
     def in_bounds(loc)
@@ -391,6 +397,18 @@ class Board < ApplicationRecord
 
   def capture(piece)
     game = self.game
+    if piece[1] == "k"
+      case piece[0]
+      when "r"
+        self.king_cap("red")
+      when "g"
+        self.king_cap("green")
+      when "b"
+        self.king_cap("blue")
+      when "y"
+        self.king_cap("yellow")
+      end
+    end
     if piece != "em_s_highlight--none"
       def bury(color, piece)
         graves = self["#{color}_taken".to_sym]
@@ -410,14 +428,11 @@ class Board < ApplicationRecord
     else
       piece
     end
-    if piece[1] == "k"
-      color = piece[0]
-      self.king_cap(color)
-    end
   end
 
   def king_cap(color)
     loser = self.players.find_by color: color
+    pry
     loser.update({status: "loser"})
     if self.is_done?
       winner = self.players.find_by color: self.game.turn

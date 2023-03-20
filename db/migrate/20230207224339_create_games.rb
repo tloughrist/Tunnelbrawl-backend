@@ -4,8 +4,6 @@ class CreateGames < ActiveRecord::Migration[7.0]
       t.references :host, foreign_key: { to_table: :users }
       t.string :title
       t.integer :no_players
-      t.boolean :email_notifications
-      t.boolean :public
       t.string :turn
       t.integer :round
       t.string :phase

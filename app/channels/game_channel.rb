@@ -4,7 +4,7 @@ class GameChannel < ApplicationCable::Channel
     stream_from "game#{params[:id]}"
     game = Game.find(params[:id])
     package = game.package
-    ActionCable.server.broadcast("game#{params[:id]}", package)
+    ActionCable.server.broadcast("game#{game.id}", package)
   end
 
 end

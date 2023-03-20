@@ -1,7 +1,7 @@
 class SuperController < ApplicationController
 
   def get_public_games
-    games = Game.where(public: true, status: "pending")
+    games = Game.where(status: "pending")
     vacancy_games = games.where("no_players < ?", 4)
     current_user = User.find(params[:user_id])
     no_user_vacancy_games = vacancy_games.select {|game| !game.users.include?(current_user)}
