@@ -22,7 +22,7 @@ class PlayersController < SuperController
 
   def update
     player = Player.find(params[:id])
-    if player.user.id.to_i == session[:user_id]
+    if player.user[:id].to_i == session[:user_id]
       player.update(player_params)
       if player.valid?
         render json: player, status: :accepted
@@ -36,9 +36,17 @@ class PlayersController < SuperController
 
   def destroy
     player = Player.find(params[:id])
-    if player.user.id.to_i == session[:user_id]
+    user = player.user
+    if user[:id].to_i == session[:user_id]
+      user.update(current_game: "none")
       player.destroy
-      head :no_content
+      games = user.games
+      if games.size > 0
+        gamePackages = games.map {|game| game.package}
+        render json: gamePackages, status: :ok
+      else
+        render json: [], status: :ok
+      end
     else
       render json: { error: "Not authorized" }, status: :unauthorized
     end
