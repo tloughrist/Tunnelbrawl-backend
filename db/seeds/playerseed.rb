@@ -26,7 +26,7 @@ players = Player.create!([
   { user_id: 3, game_id: 7, status: "active", color: "red", queening: 0 },
   { user_id: 1, game_id: 7, status: "active", color: "blue", queening: 0 },
   { user_id: 2, game_id: 7, status: "active", color: "green", queening: 0 },
-  { user_id: 3, game_id: 8, status: "active", color: "red", queening: 0 },
+  { user_id: 2, game_id: 8, status: "active", color: "red", queening: 0 },
   { user_id: 3, game_id: 8, status: "active", color: "blue", queening: 0 },
   { user_id: 5, game_id: 8, status: "active", color: "green", queening: 0 },
   { user_id: 4, game_id: 9, status: "active", color: "red", queening: 0 },
@@ -36,5 +36,10 @@ players = Player.create!([
   { user_id: 4, game_id: 11, status: "active", color: "red", queening: 0 },
   { user_id: 5, game_id: 11, status: "active", color: "blue", queening: 0 },
   { user_id: 4, game_id: 12, status: "active", color: "red", queening: 0 },
-  { user_id: 6, game_id: 12, status: "active", color: "blue", queening: 0 }
+  { user_id: 6, game_id: 12, status: "active", color: "blue", queening: 0 },
+  { user_id: 1, game_id: 13, status: "active", color: "red", queening: 0 },
+  { user_id: 2, game_id: 13, status: "active", color: "blue", queening: 0 },
+  { user_id: 1, game_id: 14, status: "active", color: "red", queening: 0 },
+  { user_id: 2, game_id: 14, status: "active", color: "blue", queening: 0 },
+  { user_id: 6, game_id: 14, status: "active", color: "green", queening: 0 },
 ])
