@@ -359,10 +359,15 @@ class Board < ApplicationRecord
     end
     legal_moves_keys = legal_hsh[:moves].map {|move| move.to_sym}
     legal_captures_keys = legal_hsh[:captures].map {|capture| capture.to_sym}
-    self[piece_loc.to_sym] = "#{self[piece_loc.to_sym].to_s[0..15]}active"
+    
+    self.update(piece_loc.to_sym => "#{self[piece_loc.to_sym].to_s[0..15]}active")
+    #self[piece_loc.to_sym] = "#{self[piece_loc.to_sym].to_s[0..15]}active"
 
-    legal_moves_keys.each {|key| self[key] = "#{self[key].to_s[0..15]}move"}
-    legal_captures_keys.each {|key| self[key] = "#{self[key].to_s[0..15]}capture"}
+    #legal_moves_keys.each {|key| self[key] = "#{self[key].to_s[0..15]}move"}
+    #legal_captures_keys.each {|key| self[key] = "#{self[key].to_s[0..15]}capture"}
+
+    legal_moves_keys.each {|key| self.update(key.to_sym => "#{self[key].to_s[0..15]}move")}
+    legal_captures_keys.each {|key| self.update(key.to_sym => "#{self[key].to_s[0..15]}capture")}
 
     self
   end
