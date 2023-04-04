@@ -62,7 +62,8 @@ class BoardsController < ApplicationController
       end
     else
       return render json: { error: "Not authorized" }, status: :unauthorized
-    end  end
+    end
+  end
 
   private
 
