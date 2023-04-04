@@ -437,14 +437,13 @@ class Board < ApplicationRecord
 
   def king_cap(color)
     loser = self.players.find_by color: color
-    pry
     loser.update({status: "loser"})
     if self.is_done?
       winner = self.players.find_by color: self.game.turn
       self.complete(winner)
     else
       self.attributes.each do |k,v|
-        if (is_board?(k) || is_deck?(k) || is_hand?(k, color) || is_camp?(k, color)) && v[0] == color
+        if (is_board?(k) || is_deck?(k) || is_hand?(k, color[0]) || is_camp?(k, color[0])) && v[0] == color[0]
           self.update({k.to_sym => "em_s_highlight--none"})
         end
       end

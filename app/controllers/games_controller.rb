@@ -45,7 +45,7 @@ class GamesController < SuperController
         game.update({status: "in progress"})
         package = game.package
         game.players.each {|player| player.update({queening: false, status: "active"})}
-        #ActionCable.server.broadcast("game#{game.id}", package)
+        ActionCable.server.broadcast("game#{game.id}", package)
         render json: package, status: :accepted
       else
         render json: { errors: "Games require 2-4 players." }, status: :unprocessable_entity
