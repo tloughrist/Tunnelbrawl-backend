@@ -52,9 +52,10 @@ class BoardsController < ApplicationController
     if players.map{|player| player.user_id.to_i}.include?(session[:user_id])
       legal = board.move_piece(params[:start_loc], params[:end_loc], session[:user_id])
       if legal
+        new_game = Board.find(params[:board_id]).game
         board.fill_camp
-        game.advance
-        package = game.package
+        new_game.advance
+        package = new_game.package
         ActionCable.server.broadcast("game#{game.id}", package)
         render json: package, status: :accepted
       else

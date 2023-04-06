@@ -332,7 +332,10 @@ class Board < ApplicationRecord
   def is_legal?(start_loc, end_loc, user_id) 
     turn = self.game[:turn]
     phase = self.game[:phase]
-    player = self.game.players.select {|player| player[:user_id] == user_id}
+    #player = self.game.players.select {|player| player[:user_id] == user_id}
+    #For testing:
+    player = self.game.players.select {|player| player[:color] == turn}
+
     piece = self.attributes.select {|k,v| k.to_s == start_loc}
     piece_color = piece[start_loc][0]
     if turn == player[0][:color] && player[0][:color][0] == piece_color
@@ -361,10 +364,6 @@ class Board < ApplicationRecord
     legal_captures_keys = legal_hsh[:captures].map {|capture| capture.to_sym}
     
     self.update(piece_loc.to_sym => "#{self[piece_loc.to_sym].to_s[0..15]}active")
-    #self[piece_loc.to_sym] = "#{self[piece_loc.to_sym].to_s[0..15]}active"
-
-    #legal_moves_keys.each {|key| self[key] = "#{self[key].to_s[0..15]}move"}
-    #legal_captures_keys.each {|key| self[key] = "#{self[key].to_s[0..15]}capture"}
 
     legal_moves_keys.each {|key| self.update(key.to_sym => "#{self[key].to_s[0..15]}move")}
     legal_captures_keys.each {|key| self.update(key.to_sym => "#{self[key].to_s[0..15]}capture")}
@@ -402,18 +401,6 @@ class Board < ApplicationRecord
 
   def capture(piece)
     game = self.game
-    if piece[1] == "k"
-      case piece[0]
-      when "r"
-        self.king_cap("red")
-      when "g"
-        self.king_cap("green")
-      when "b"
-        self.king_cap("blue")
-      when "y"
-        self.king_cap("yellow")
-      end
-    end
     if piece != "em_s_highlight--none"
       def bury(color, piece)
         graves = self["#{color}_taken".to_sym]
@@ -430,8 +417,18 @@ class Board < ApplicationRecord
       when "yellow"
         bury("yellow", piece)
       end
-    else
-      piece
+      if piece[1] == "k"
+        case piece[0]
+        when "r"
+          self.king_cap("red")
+        when "g"
+          self.king_cap("green")
+        when "b"
+          self.king_cap("blue")
+        when "y"
+          self.king_cap("yellow")
+        end
+      end
     end
   end
 
@@ -629,8 +626,8 @@ class Board < ApplicationRecord
   end
 
   def complete(winner)
-    self.game.update(:status => "complete")
     winner.update(:status => "winner")
+    self.game.update(:status => "complete")
   end
 
 end
