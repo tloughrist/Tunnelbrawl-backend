@@ -84,3 +84,4 @@ production:
   database: tunnelbrawl_app_production
   username: tunnelbrawl_app
   password: <%= ENV["TUNNELBRAWL_APP_DATABASE_PASSWORD"] %>
+  url: <%= ENV['DATABASE_URL'] %>
