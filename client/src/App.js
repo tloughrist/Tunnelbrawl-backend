@@ -89,7 +89,7 @@ function App() {
                 logout={logout}
               />} />
               <Route path="/taproom" element={<Taproom />} />
-              <Route path="/home" element={<Home />} />
+              <Route path="/#/home" element={<Home />} />
               <Route path="/" element={<Navigate to="/home" />} />
             </Routes>
           </div>
