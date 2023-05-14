@@ -65,4 +65,14 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
+  # Configure for cookies
+  Rails.application.config.session_store :cookie_store, {
+    :key => 'tunnelbrawl',
+    :domain => :all,
+    :same_site => :none,
+    :secure => :true,
+    :tld_length => 2
+  }
+
 end
