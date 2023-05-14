@@ -13,7 +13,8 @@ export default async function createGame(userId, title) {
       phase: "move",
       status: "pending"
     }),
-    });
+  });
+  console.log(res)
   if (res.ok) {
     const pkg = await res.json();
     return pkg;
