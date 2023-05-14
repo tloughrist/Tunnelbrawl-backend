@@ -13,6 +13,7 @@ require "action_mailer/railtie"
 require "action_view/railtie"
 require "action_cable/engine"
 require "rails/test_unit/railtie"
+require "rack/rewrite"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -44,5 +45,11 @@ module TunnelbrawlApp
 
     # This is only a rails api
     config.api_only = true
+
+    # Rack rewrite rules
+    config.middleware.insert_before(Rack::Runtime, Rack::Rewrite) do
+      rewrite   '/home',  '/'
+    end
+
   end
 end
