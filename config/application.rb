@@ -40,8 +40,13 @@ module TunnelbrawlApp
     config.middleware.use ActionDispatch::Session::CookieStore
 
     # Use SameSite=Strict for all cookies to help protect against CSRF
-    config.action_dispatch.cookies_same_site_protection = :nil
+    config.session_store :cookie_store, key: '_base_session', domain: :all, same_site: :none, secure: true
 
+    config.action_dispatch.cookies_same_site_protection = :none
+
+    config.force_ssl = true
+
+    # This is only a rails api
     config.api_only = true
   end
 end
