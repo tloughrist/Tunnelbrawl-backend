@@ -7,7 +7,7 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins "http://localhost:4000/", "tunnelbrawl-mw6u.onrender.com"
+    origins "http://localhost:4000", "tunnelbrawl-mw6u.onrender.com"
 
     resource "*",
       headers: :any,
