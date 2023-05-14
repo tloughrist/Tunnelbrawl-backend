@@ -48,7 +48,7 @@ module TunnelbrawlApp
 
     # Rack rewrite rules
     config.middleware.insert_before(Rack::Runtime, Rack::Rewrite) do
-      rewrite   '/home',  '/'
+      rewrite   '/',  '/home'
     end
 
   end
