@@ -69,7 +69,7 @@ function App() {
 
   return (
     <LoggedInContext.Provider value={isLoggedIn}>
-      <UserContext.Provider value={userRef.current}>
+      <UserContext.Provider value={user}>
         <div className="App">
           <Banner />
           <div id="content_panel">
