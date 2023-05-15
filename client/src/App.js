@@ -31,7 +31,6 @@ function App() {
     async function fetchData() {
       const response = await fetch("/me");
       if (response.ok) {
-        console.log("fetch")
         const usr = await response.json();
         setUser(usr);
         setIsLoggedIn(true);
@@ -60,8 +59,6 @@ function App() {
     //fetchData();
     navigate("/home");
   };
-
-  console.log(isLoggedIn);
 
   function logout() {
     navigate("/home");

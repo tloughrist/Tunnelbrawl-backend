@@ -14,6 +14,7 @@ function Games({ }) {
   
   const isLoggedIn = useContext(LoggedInContext);
   const user = useContext(UserContext);
+
   const [games, _setGames] = useState([]);
   const [selectedGame, setSelectedGame] = useState("none");
   const [gamePkg, _setGamePkg] = useState({});
@@ -34,7 +35,7 @@ function Games({ }) {
     _setGamePkg(data);
   };
 
-  console.log(user)
+  
 
   function subscribe() {
     const sub = cable.subscriptions.create({
@@ -67,6 +68,7 @@ function Games({ }) {
       gameProvider(user.id);
       setSelectedGame(user.current_game);
     }
+    console.log(user)
   }, [user]);
 
   useEffect(() => {
