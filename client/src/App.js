@@ -17,15 +17,15 @@ export { LoggedInContext, UserContext };
 function App() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState({});
+  const [user, _setUser] = useState({});
   const [logNav, setLogNav] = useState(false);
   const navigate = useNavigate();
   const userRef = useRef(user);
 
-  /* function setUser(data) {
+  function setUser(data) {
     _setUser(data);
     userRef.current = data;
-  }; */
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -67,9 +67,11 @@ function App() {
     //setLogNav(false);
   };
 
+  console.log(userRef.current)
+
   return (
     <LoggedInContext.Provider value={isLoggedIn}>
-      <UserContext.Provider value={user}>
+      <UserContext.Provider value={userRef.current}>
         <div className="App">
           <Banner />
           <div id="content_panel">

@@ -35,8 +35,6 @@ function Games({ }) {
     _setGamePkg(data);
   };
 
-  
-
   function subscribe() {
     const sub = cable.subscriptions.create({
       channel: 'GameChannel',
@@ -68,7 +66,6 @@ function Games({ }) {
       gameProvider(user.id);
       setSelectedGame(user.current_game);
     }
-    console.log(user)
   }, [user]);
 
   useEffect(() => {
