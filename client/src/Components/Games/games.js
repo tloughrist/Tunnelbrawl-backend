@@ -34,6 +34,8 @@ function Games({ }) {
     _setGamePkg(data);
   };
 
+  console.log(user)
+
   function subscribe() {
     const sub = cable.subscriptions.create({
       channel: 'GameChannel',
