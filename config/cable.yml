@@ -9,5 +9,5 @@ test:
 
 production:
   adapter: redis
-  url: redis://127.0.0.1:6379
+  url: redis://red-chhu8aorddldrove8eq0:6379
   channel_prefix: tunnel_brawl_production
