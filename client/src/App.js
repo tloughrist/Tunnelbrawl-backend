@@ -67,8 +67,6 @@ function App() {
     //setLogNav(false);
   };
 
-  console.log(userRef.current)
-
   return (
     <LoggedInContext.Provider value={isLoggedIn}>
       <UserContext.Provider value={userRef.current}>

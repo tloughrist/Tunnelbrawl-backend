@@ -51,9 +51,6 @@ export default function Game({ gamePkg, setGamePkg, setGames, setSelectedGame })
     activeRef.current = data;
   };
 
-  console.log(isHost)
-  console.log(gamePkg)
-
   function announceGameWinner() {
     const winner = gamePkg.game.players.find((player) => {
       return player.status === "winner";
