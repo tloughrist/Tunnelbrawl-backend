@@ -18,7 +18,7 @@ function Games({ }) {
   const [games, _setGames] = useState([]);
   const [selectedGame, setSelectedGame] = useState("none");
   const [gamePkg, _setGamePkg] = useState({});
-  const [cable, setCable] = useState(ActionCable.createConsumer('https://tunnelbrawl.onrender.com/cable'));
+  const [cable, setCable] = useState(ActionCable.createConsumer('/cable'));
   const [subscript, setSubscript] = useState({});
   const navigate = useNavigate();
 
