@@ -89,7 +89,7 @@ function Games({ }) {
     const updatedUser = await submitUser(user.id, {...user, current_game: value});
   };
 
-  console.log(selectedGame)
+  console.log(gamePkgRef.current)
 
   return (
     <div>
