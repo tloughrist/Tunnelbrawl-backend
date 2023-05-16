@@ -89,6 +89,8 @@ function Games({ }) {
     const updatedUser = await submitUser(user.id, {...user, current_game: value});
   };
 
+  console.log(selectedGame)
+
   return (
     <div>
       <GamesContext.Provider value={gamesRef.current}>
