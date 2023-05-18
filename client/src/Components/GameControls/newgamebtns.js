@@ -11,7 +11,6 @@ export default function NewGameBtns({ games, setGames, setSelectedGame }) {
 
   async function handleSubmit(e){
     e.preventDefault();
-    console.log(user.id)
     const gamePkg = await createGame(user.id, title);
     setGames([...games, gamePkg]);
     setSelectedGame(gamePkg.game.id);

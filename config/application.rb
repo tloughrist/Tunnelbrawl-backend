@@ -46,10 +46,5 @@ module TunnelbrawlApp
     # This is only a rails api
     config.api_only = true
 
-    # Rack rewrite rules
-    config.middleware.insert_before(Rack::Runtime, Rack::Rewrite) do
-      rewrite   '/',  '/home'
-    end
-
   end
 end
