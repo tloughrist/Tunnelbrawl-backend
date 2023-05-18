@@ -18,6 +18,7 @@ export default async function createGame(userId, title) {
     const pkg = await res.json();
     return pkg;
   } else {
+    console.log("error")
     //alert(res.errors);
   }
 };
