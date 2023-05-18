@@ -7,7 +7,7 @@ class GamesController < SuperController
     board = game.make_board
     Player.create(user_id: game.host_id, game_id: game.id, color: "red", status: "active", queening: 0)
     if game.valid?
-      CleanupJob.perform_in(2.minutes, game)
+      CleanupJob.perform_in(2.minutes, game.id)
       package = game.package
       render json: package, status: :created
     else
@@ -16,7 +16,7 @@ class GamesController < SuperController
   end
 
   def get_public
-    #Game.destroy_all
+    Game.destroy_all
     self.get_public_games
   end
 
