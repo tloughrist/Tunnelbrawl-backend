@@ -16,6 +16,7 @@ class GamesController < SuperController
   end
 
   def get_public
+    #Game.destroy_all
     self.get_public_games
   end
 

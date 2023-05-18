@@ -18,6 +18,8 @@ function PlayersWanted() {
     }
   }, [user]);
 
+  console.log(publicGames)
+
   return (
     <div className="text_block">
         {
