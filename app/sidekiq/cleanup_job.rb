@@ -3,6 +3,6 @@ class CleanupJob
 
   def perform(game_id)
     game = Game.find(game_id)
-    game.destroy if game.status == 'pending'
+    game.destroy if game[:status] == 'pending'
   end
 end

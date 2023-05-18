@@ -14,12 +14,8 @@ export default async function createGame(userId, title) {
       status: "pending"
     }),
   });
-  console.log(res)
-  console.log(res.ok)
-  const pkg = await res.json();
-  console.log(pkg)
   if (res.ok) {
-    //const pkg = await res.json();
+    const pkg = await res.json();
     return pkg;
   } else {
     //alert(res.errors);
