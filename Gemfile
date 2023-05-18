@@ -37,7 +37,4 @@ end
 
 gem "active_model_serializers", "~> 0.10.12"
 
-# rack rewrite rules
-gem 'rack-rewrite', '~> 1.5.0'
-
 gem "sidekiq", "~> 7.1"
