@@ -1,3 +1,5 @@
+require 'sidekiq'
+
 class CleanupJob
   include Sidekiq::Job
 
