@@ -15,6 +15,7 @@ class GamesController < SuperController
   end
 
   def get_public
+    Game.destory_all
     self.get_public_games
   end
 
